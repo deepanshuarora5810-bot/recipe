@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecipeTin Eats – Fast Prep, Big Flavours</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.page { display: none; }
+.page.active { display: block; }
+.card-img-wrap { cursor: pointer; overflow: hidden; }
+.card-img-wrap img { transition: transform .35s; }
+.card-img-wrap:hover img { transform: scale(1.05); }
+.recipe-page-inner { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+.back-btn { display: inline-flex; align-items: center; gap: 8px; color: #c0502a; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; border: 2px solid #c0502a; padding: 8px 18px; margin-bottom: 32px; cursor: pointer; background: transparent; font-family: 'Lato', sans-serif; transition: all .2s; }
+.back-btn:hover { background: #c0502a; color: #fff; }
+.recipe-hero-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border: 2px solid #e8e0d5; margin-bottom: 28px; }
+.recipe-content h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 12px; line-height: 1.15; }
+.recipe-meta-bar { display: flex; flex-wrap: wrap; gap: 20px; background: #fef3e8; border: 2px solid #e8d5bc; padding: 18px 24px; margin: 20px 0 28px; }
+.meta-item { text-align: center; }
+.meta-label { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #c0502a; }
+.meta-value { font-size: 16px; font-weight: 700; }
+.recipe-intro { font-size: 17px; color: #555; line-height: 1.8; margin-bottom: 32px; font-style: italic; border-left: 4px solid #c0502a; padding-left: 20px; }
+.recipe-content h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin: 32px 0 14px; border-bottom: 2px solid #e8e0d5; padding-bottom: 8px; }
+.recipe-content ul, .recipe-content ol { padding-left: 22px; margin-bottom: 16px; }
+.recipe-content li { margin-bottom: 8px; font-size: 15px; line-height: 1.6; }
+.tip-box { background: #fff8f0; border: 2px solid #e8b87e; padding: 18px 22px; margin: 24px 0; }
+.tip-box strong { color: #c0502a; }
+.recipe-content p { margin-bottom: 14px; font-size: 15px; line-height: 1.7; }
+.video-container { margin: 28px 0; border: 2px solid #e8e0d5; padding: 20px; background: #faf7f4; }
+.video-container iframe { border-radius: 4px; }
+/* VIEW ALL PAGE */
+.viewall-inner { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+.viewall-header { margin-bottom: 28px; }
+.viewall-header h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 6px; }
+.viewall-header p { color: #888; font-size: 15px; }
+.viewall-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+@media (max-width: 900px) { .viewall-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 560px) { .viewall-grid { grid-template-columns: 1fr; } }
+/* DISH NAME CARD */
+.name-card { background: #fff; border: 2px solid #e8e0d5; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.name-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.10); border-color: #c0502a; }
+.name-card-thumb { aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+.name-card-body { padding: 14px 16px 16px; flex: 1; }
+.name-card-cat { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #c0502a; margin-bottom: 5px; }
+.name-card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
+.name-card-meta { display: flex; gap: 12px; font-size: 12px; color: #888; }
+.coming-soon { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #bbb; border: 1.5px dashed #ddd; padding: 3px 10px; }
+/* DRINKS SECTION */
+.drinks-section { background: linear-gradient(135deg, #0d2f45 0%, #1a5070 60%, #0a1e2e 100%); padding: 60px 0; margin: 0; }
+.drinks-section .section { padding-top: 0; padding-bottom: 0; }
+.drinks-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(127,212,247,.15); border: 1px solid rgba(127,212,247,.35); color: #7fd4f7; padding: 6px 16px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; border-radius: 2px; margin-bottom: 14px; }
+.drinks-section .section-title { color: #fff; font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
+.drinks-sub { color: rgba(255,255,255,.6); font-size: 15px; margin-bottom: 28px; margin-top: 6px; }
+.drinks-section .section-link { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #7fd4f7; border-bottom: 2px solid #7fd4f7; padding-bottom: 2px; cursor: pointer; }
+.drinks-section .section-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.drinks-section .card { border-color: rgba(255,255,255,.15); background: rgba(255,255,255,.07); backdrop-filter: blur(4px); cursor: pointer; overflow: hidden; }
+.drinks-section .card:hover { border-color: #7fd4f7; box-shadow: 0 12px 32px rgba(0,0,0,.35); transform: translateY(-4px); }
+.drinks-section .card-title { color: #fff; font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; line-height: 1.3; margin-bottom: 10px; }
+.drinks-section .card-meta { color: rgba(255,255,255,.55); font-size: 12px; display: flex; gap: 12px; }
+.drinks-section .card-cat { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #7fd4f7; margin-bottom: 6px; }
+.drinks-section .card-body { padding: 16px; flex: 1; }
+.drink-img-wrap { overflow: hidden; position: relative; }
+.drink-img-wrap img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; transition: transform .35s; filter: brightness(.88) saturate(1.15); }
+.drinks-section .card:hover .drink-img-wrap img { transform: scale(1.06); filter: brightness(.95) saturate(1.2); }
+/* DRINK RECIPE PAGES */
+.back-btn.drinks-back { color: #2a6b8a; border-color: #2a6b8a; }
+.back-btn.drinks-back:hover { background: #2a6b8a; color: #fff; }
+.recipe-meta-bar.drinks-meta { background: #eef7ff; border-color: #b8dff0; }
+.drinks-meta .meta-label { color: #2a6b8a; }
+.recipe-intro.drink-intro { border-left-color: #2a6b8a; }
+.tip-box.drink-tip { background: #f0f8ff; border-color: #7fd4f7; }
+.tip-box.drink-tip strong { color: #2a6b8a; }
+/* REVIEWS SECTION */
+.reviews-section { background: #fdf9f5; padding: 70px 0 60px; border-top: 3px solid #e8e0d5; }
+.reviews-section .section { padding-top: 0; padding-bottom: 0; }
+.reviews-header { text-align: center; margin-bottom: 44px; }
+.reviews-badge { display: inline-flex; align-items: center; gap: 8px; background: #fff3e6; border: 1.5px solid #e8b87e; color: #c0502a; padding: 6px 16px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; border-radius: 2px; margin-bottom: 14px; }
+.reviews-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 4vw, 36px); font-weight: 700; color: #1a1a1a; margin-bottom: 8px; margin-top: 4px; }
+.reviews-sub { color: #888; font-size: 15px; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-bottom: 48px; }
+@media (max-width: 960px) { .reviews-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .reviews-grid { grid-template-columns: 1fr; } }
+.review-card { background: #fff; border: 2px solid #e8e0d5; padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 16px; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; position: relative; }
+.review-card::before { content: '\201C'; position: absolute; top: 14px; right: 20px; font-family: 'Playfair Display', serif; font-size: 64px; color: #f0e8df; line-height: 1; pointer-events: none; }
+.review-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(192,80,42,.1); border-color: #c0502a; }
+.review-card--highlight { background: linear-gradient(160deg, #fff8f2 0%, #fff 100%); border-color: #e8b87e; }
+.review-stars { color: #e8960a; font-size: 16px; letter-spacing: 2px; }
+.review-text { font-size: 14.5px; line-height: 1.75; color: #444; flex: 1; font-style: italic; margin: 0; }
+.review-footer { display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid #f0e8df; }
+.reviewer-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 3px 10px rgba(0,0,0,.15); }
+.reviewer-name { font-size: 14px; font-weight: 700; color: #1a1a1a; font-family: 'Lato', sans-serif; }
+.reviewer-detail { font-size: 11.5px; color: #999; margin-top: 2px; letter-spacing: .02em; }
+.reviews-stats { display: flex; justify-content: center; align-items: center; background: #fff; border: 2px solid #e8e0d5; padding: 28px 16px; flex-wrap: wrap; }
+.stat-item { text-align: center; padding: 0 36px; flex: 1; min-width: 120px; }
+.stat-number { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #c0502a; line-height: 1; margin-bottom: 4px; }
+.stat-stars { color: #e8960a; font-size: 13px; letter-spacing: 2px; margin-bottom: 4px; }
+.stat-label { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #999; }
+.stat-divider { width: 1px; height: 52px; background: #e8e0d5; flex-shrink: 0; }
+@media (max-width: 640px) { .stat-divider { display: none; } .stat-item { min-width: 50%; padding: 12px 16px; } }
+/* STATIC PAGES */
+.static-page-inner { max-width: 820px; margin: 0 auto; padding: 48px 24px 80px; }
+.static-page-inner h1 { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; margin-bottom: 18px; line-height: 1.15; }
+.static-page-inner h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin: 32px 0 12px; border-bottom: 2px solid #e8e0d5; padding-bottom: 8px; }
+.static-page-inner p { font-size: 15px; line-height: 1.8; color: #444; margin-bottom: 14px; }
+.static-page-inner a { color: #c0502a; font-weight: 700; cursor: pointer; }
+.cookbook-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 28px; }
+@media(max-width:768px){ .cookbook-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width:480px){ .cookbook-grid { grid-template-columns: 1fr; } }
+.cookbook-card { background:#fff; border:2px solid #e8e0d5; padding:28px 22px; text-align:center; transition:transform .2s,box-shadow .2s,border-color .2s; }
+.cookbook-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,.1); border-color:#c0502a; }
+.cookbook-card .cb-emoji { font-size:56px; margin-bottom:14px; }
+.cookbook-card h3 { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:8px; }
+.cookbook-card p { font-size:13.5px; color:#666; line-height:1.6; margin-bottom:16px; }
+.cookbook-card .cb-btn { display:inline-block; background:#c0502a; color:#fff; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:10px 22px; cursor:pointer; border:none; font-family:'Lato',sans-serif; }
+.cookbook-card .cb-btn:hover { background:#a03e1e; }
+.foodbank-stats { display:flex; gap:0; border:2px solid #e8e0d5; margin:32px 0; flex-wrap:wrap; }
+.fb-stat { flex:1; min-width:140px; text-align:center; padding:28px 16px; border-right:1px solid #e8e0d5; }
+.fb-stat:last-child { border-right:none; }
+.fb-stat .fb-num { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:#c0502a; }
+.fb-stat .fb-label { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#999; margin-top:4px; }
+</style>
+</head>
+<body>
+<!-- TOP BAR -->
+<div class="topbar">🍴 NEW COOKBOOK: <a onclick="showPage('cookbooks');return false;" href="#">"Tonight" is here — get your copy!</a></div>
+<!-- HEADER -->
+<header>
+<div class="header-inner">
+<a onclick="showPage('home')" class="logo" style="cursor:pointer">
+<span class="logo-text">RecipeTin Eats</span>
+<span class="logo-sub">Fast Prep, Big Flavours</span>
+</a>
+<nav>
+<div class="dropdown">
+<a href="#">Recipes ▾</a>
+<div class="dropdown-menu">
+<a onclick="showPage('cat-quickeasy')">Quick & Easy</a>
+<a onclick="showPage('cat-chicken')">Chicken</a>
+<a onclick="showPage('cat-beef')">Beef</a>
+<a onclick="showPage('cat-pasta')">Pasta</a>
+<a onclick="showPage('cat-soups')">Soups</a>
+<a onclick="showPage('cat-desserts')">Desserts</a>
+<a onclick="showPage('cat-asian')">Asian</a>
+<a onclick="showPage('italian')" href="#" style="color:#c0502a;font-weight:700;">🇮🇹 Italian</a>
+<a onclick="showPage('cat-mexican')">Mexican</a>
+<a onclick="scrollToDrinks()" href="#" style="color:#2a6b8a;font-weight:700;">🥤 Drinks</a>
+</div>
+</div>
+<div class="dropdown">
+<a href="#">By Category ▾</a>
+<div class="dropdown-menu">
+<a onclick="showPage('cat-onepot')">One Pot / One Pan</a>
+<a onclick="showPage('cat-slowcooker')">Slow Cooker</a>
+<a onclick="showPage('cat-bbq')">BBQ & Grilling</a>
+<a onclick="showPage('cat-vegetarian')">Vegetarian</a>
+<a onclick="showPage('cat-lowcal')">Low Calorie</a>
+<a onclick="showPage('cat-glutenfree')">Gluten Free</a>
+</div>
+</div>
+<a onclick="showPage('about')">About</a>
+<a onclick="showPage('quiz')" style="color:#c0502a;font-weight:700;">🎯 Dish Finder</a>
+<a onclick="showPage('cookbooks')">Cookbooks</a>
+<a onclick="showPage('foodbank')">My Food Bank</a>
+<a onclick="showPage('chefpicks')" style="color:#c0502a;font-weight:700;">👨‍🍳 Chef Picks</a>
+</nav>
+<input id="search-input" class="header-search" type="search" placeholder="🔍  Search recipes…">
+</div>
+</header>
+
+<!-- HOME PAGE -->
+<div id="home" class="page active">
+<section class="hero">
+<div class="hero-bg"></div>
+<div class="hero-content">
+<span class="hero-tag">⭐ Reader Favourite</span>
+<h1>A Truly Great<br>Recipe Generator</h1>
+<p>The stuff food dreams are made of — crispy, saucy, cheesy perfection.</p>
+<a onclick="showPage('lasagna')" class="btn-hero" style="cursor:pointer">Get the Recipe</a>
+</div>
+</section>
+<div class="section" style="padding-bottom:0">
+<div class="pills">
+<a onclick="showPage('cat-chicken')" class="pill">🍗 Chicken</a>
+<a onclick="showPage('cat-beef')" class="pill">🥩 Beef</a>
+<a onclick="showPage('cat-pasta')" class="pill">🍝 Pasta</a>
+<a onclick="showPage('cat-asian')" class="pill">🍜 Asian</a>
+<a onclick="showPage('cat-onepot')" class="pill">🫕 One Pot</a>
+<a onclick="showPage('cat-quickeasy')" class="pill">⚡ Quick & Easy</a>
+<a onclick="showPage('italian')" href="#" class="pill" style="border-color:#c0502a;color:#c0502a;">🇮🇹 Italian</a>
+<a onclick="showPage('cat-mexican')" class="pill">🌮 Mexican</a>
+<a onclick="showPage('cat-desserts')" class="pill">🧁 Desserts</a>
+<a onclick="showPage('cat-salads')" class="pill">🥗 Salads</a>
+<a onclick="showPage('cat-slowcooker')" class="pill">🍲 Slow Cooker</a>
+<a onclick="scrollToDrinks()" href="#" class="pill" style="border-color:#2a6b8a;color:#2a6b8a;">🥤 Drinks</a>
+</div>
+</div>
+<div class="section" style="padding-top:10px">
+<div class="section-head">
+<h2 class="section-title">Featured This Week</h2>
+<a onclick="showPage('viewall')" class="section-link" style="cursor:pointer">View All →</a>
+</div>
+<div class="featured-grid">
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('lasagna')">
+<img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Italian · Pasta</div>
+<div class="card-title">The Best Homemade Lasagna</div>
+<div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 8 servings</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('beefstew')">
+<img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Beef · Comfort Food</div>
+<div class="card-title">Rich & Hearty Beef Stew</div>
+<div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6 servings</span></div>
+</div>
+</div>
+</div>
+<div class="cards-grid">
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('padthai')">
+<img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Thai · Quick</div>
+<div class="card-title">Authentic Pad Thai</div>
+<div class="card-meta"><span>⏱ 20 min</span><span>👥 2 servings</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('butterchicken')">
+<img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Indian · Curry</div>
+<div class="card-title">Creamy Butter Chicken</div>
+<div class="card-meta"><span>⏱ 35 min</span><span>👥 4 servings</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('garlicbread')">
+<img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Sides · Bread</div>
+<div class="card-title">Cheesy Garlic Bread</div>
+<div class="card-meta"><span>⏱ 15 min</span><span>👥 6 servings</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('lavacake')">
+<img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Desserts · Chocolate</div>
+<div class="card-title">Molten Chocolate Lava Cakes</div>
+<div class="card-meta"><span>⏱ 25 min</span><span>👥 4 servings</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="banner-strip">
+<h2>🍽 Italian Week — Explore the Full Menu</h2>
+<p>From handmade pasta to slow-roasted classics, it's all things Italy this week.</p>
+<a onclick="showPage('italian')" class="btn-white" style="cursor:pointer">Browse Italian Recipes</a>
+</div>
+<div class="section">
+<div class="section-head">
+<h2 class="section-title">Quick & Easy Weeknight Dinners</h2>
+<a onclick="showPage('cat-quickeasy')" class="section-link" style="cursor:pointer">View All →</a>
+</div>
+<div class="cards-grid">
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('friedrice')">
+<img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Asian · Rice</div>
+<div class="card-title">Better-Than-Takeout Fried Rice</div>
+<div class="card-meta"><span>⏱ 15 min</span><span>👥 3 servings</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('tacos')">
+<img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Mexican · Quick</div>
+<div class="card-title">Crispy Beef Tacos</div>
+<div class="card-meta"><span>⏱ 25 min</span><span>👥 4 servings</span></div>
+</div>
+</div>
+<div class="card">
+<div class="card-img-wrap" onclick="showPage('mushroompasta')">
+<img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')">
+</div>
+<div class="card-body">
+<div class="card-cat">Vegetarian · Pasta</div>
+<div class="card-title">Creamy Mushroom Pasta</div>
+<div class="card-meta"><span>⏱ 20 min</span><span>👥 2 servings</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- QUIZ PROMO -->
+<div class="banner-strip quiz-banner" style="background: linear-gradient(135deg, #1a3a1a 0%, #4a7a3a 100%); margin: 40px 0;">
+  <h2>🤔 Not sure what to cook tonight?</h2>
+  <p>Take our 1-minute quiz and let us find your perfect recipe match!</p>
+  <a onclick="showPage('quiz')" class="btn-white" style="cursor:pointer; color: #1a3a1a;">Start Dish Finder Quiz</a>
+</div>
+
+<!-- DRINKS SECTION -->
+<div class="drinks-section" id="drinks-section">
+<div class="section">
+<div class="drinks-badge">🥤 New Category</div>
+<div class="section-head">
+<div>
+<h2 class="section-title">Sip Something Special</h2>
+<p class="drinks-sub">Craft mocktails, refreshing coolers & warming brews — all made at home.</p>
+</div>
+<a onclick="showPage('viewall')" class="section-link">View All →</a>
+</div>
+<div class="cards-grid">
+<div class="card" onclick="showPage('mangoLassi')">
+<div class="drink-img-wrap">
+<img src="../assets/mango.jpeg" alt="Mango Lassi" onerror="this.parentElement.innerHTML='<div style=\'width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#f7d070,#e8a020);display:flex;align-items:center;justify-content:center;font-size:52px;\'>🥭</div>'">
+</div>
+<div class="card-body">
+<div class="card-cat">Indian · Mocktail</div>
+<div class="card-title">Mango Lassi</div>
+<div class="card-meta"><span>⏱ 5 min</span><span>🍹 2 glasses</span></div>
+</div>
+</div>
+<div class="card" onclick="showPage('masalachai')">
+<div class="drink-img-wrap">
+<img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&q=80" alt="Masala Chai" onerror="this.parentElement.innerHTML='<div style=\'width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#c87040,#7a3810);display:flex;align-items:center;justify-content:center;font-size:52px;\'>☕</div>'">
+</div>
+<div class="card-body">
+<div class="card-cat">Indian · Hot Drink</div>
+<div class="card-title">Masala Chai</div>
+<div class="card-meta"><span>⏱ 10 min</span><span>🍹 2 cups</span></div>
+</div>
+</div>
+<div class="card" onclick="showPage('limonata')">
+<div class="drink-img-wrap">
+<img src="https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=600&q=80" alt="Sparkling Limonata" onerror="this.parentElement.innerHTML='<div style=\'width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#d4e840,#8aaa10);display:flex;align-items:center;justify-content:center;font-size:52px;\'>🍋</div>'">
+</div>
+<div class="card-body">
+<div class="card-cat">Italian · Mocktail</div>
+<div class="card-title">Sparkling Limonata</div>
+<div class="card-meta"><span>⏱ 8 min</span><span>🍹 4 glasses</span></div>
+</div>
+</div>
+<div class="card" onclick="showPage('matcharose')">
+<div class="drink-img-wrap">
+<img src="https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?w=600&q=80" alt="Matcha Rose Latte" onerror="this.parentElement.innerHTML='<div style=\'width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#5aaa70,#1a6a30);display:flex;align-items:center;justify-content:center;font-size:52px;\'>🍵</div>'">
+</div>
+<div class="card-body">
+<div class="card-cat">Japanese · Hot/Iced</div>
+<div class="card-title">Matcha Rose Latte</div>
+<div class="card-meta"><span>⏱ 7 min</span><span>🍹 1 glass</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- REVIEWS SECTION -->
+<div class="reviews-section" id="reviews-section">
+  <div class="section">
+    <div class="reviews-header">
+      <div class="reviews-badge">⭐ Community Love</div>
+      <h2 class="reviews-title">What Our Readers Say</h2>
+      <p class="reviews-sub">Real cooks, real kitchens, real results — from our community of 5 million+ home chefs.</p>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The Butter Chicken recipe is an absolute game-changer. My family thought I'd ordered from a restaurant. The tip about blending the sauce made all the difference — silky smooth every time!"</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar" style="background:linear-gradient(135deg,#c0502a,#7a2008)">P</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Priya M.</div>
+            <div class="reviewer-detail">Made: Creamy Butter Chicken · Mumbai</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card review-card--highlight">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"I made the Lasagna for my in-laws' first visit and it was a HUGE hit. Preparing the meat sauce the day before was such smart advice — assembly was easy and the flavour was absolutely insane."</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar" style="background:linear-gradient(135deg,#2a6b8a,#0a2e3a)">S</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Sophie L.</div>
+            <div class="reviewer-detail">Made: Best Homemade Lasagna · London</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Pad Thai in 20 minutes! I was sceptical but it genuinely beats my local takeaway. The wok heat tip is spot on — I cranked it up and finally got that smoky flavour I'd always been chasing."</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar" style="background:linear-gradient(135deg,#c9983a,#7a5a12)">K</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Kenji W.</div>
+            <div class="reviewer-detail">Made: Authentic Pad Thai · Sydney</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★☆</div>
+        <p class="review-text">"The Mango Lassi recipe is incredibly refreshing. Used tinned Alphonso pulp as suggested and WOW — nothing like the watered-down versions I used to make. Already planning to serve it to guests!"</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar" style="background:linear-gradient(135deg,#f7d070,#c07a10)">A</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Ananya R.</div>
+            <div class="reviewer-detail">Made: Mango Lassi · Delhi</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Never thought fried rice could taste this good at home. The cold-rice tip is a revelation — perfectly separated, smoky grains instead of the mushy mess I used to make. My kids ask for it every week!"</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar" style="background:linear-gradient(135deg,#4a7a3a,#1a3a1a)">M</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Maria T.</div>
+            <div class="reviewer-detail">Made: Better-Than-Takeout Fried Rice · Toronto</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card review-card--highlight">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The Masala Chai recipe brought back memories of chai from my grandmother's kitchen. Letting it boil twice is the step nobody else tells you — it creates that rich, layered flavour that's truly authentic."</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar" style="background:linear-gradient(135deg,#c87040,#7a3810)">R</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Rajan S.</div>
+            <div class="reviewer-detail">Made: Masala Chai · Chandigarh</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="reviews-stats">
+      <div class="stat-item"><div class="stat-number">4.9</div><div class="stat-stars">★★★★★</div><div class="stat-label">Average Rating</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-number">48,200+</div><div class="stat-label">Recipes Reviewed</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-number">5M+</div><div class="stat-label">Happy Cooks</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-number">127</div><div class="stat-label">Countries Cooking</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="about-strip">
+<div class="about-inner">
+<div class="about-text">
+<h3>Hi, I'm Deepanshu!</h3>
+<p>I believe you can make great food with everyday ingredients — even if you're short on time. All you need is one good recipe to find your confidence in the kitchen. I'm not a chef; I'm a home cook like you, sharing real recipes that actually work.<br><br><a onclick="showPage('about')" href="#">Read more about me →</a></p>
+</div>
+</div>
+</div>
+<div class="newsletter">
+<h2>Get New Recipes Every Week</h2>
+<p>Join 5 million+ readers — free recipes delivered straight to your inbox.</p>
+<div class="nl-form">
+<input class="nl-input" type="email" id="nl-email" placeholder="Your email address">
+<button class="nl-btn" onclick="subscribeNewsletter(this)">Subscribe</button>
+</div>
+</div>
+<footer>
+<div class="footer-inner">
+<div class="footer-brand">
+<a onclick="showPage('home')" class="logo" style="align-items:flex-start;padding:0;margin-bottom:6px;cursor:pointer">
+<span class="logo-text">RecipeTin Eats</span>
+<span class="logo-sub">Fast Prep, Big Flavours</span>
+</a>
+<p>Real recipes for real people. Quick prep, bold flavours, and results you can count on every night of the week.</p>
+</div>
+<div class="footer-col">
+<h4>Recipes</h4>
+<a onclick="showPage('cat-quickeasy')">Quick & Easy</a>
+<a onclick="showPage('cat-onepot')">One Pot</a>
+<a onclick="showPage('cat-slowcooker')">Slow Cooker</a>
+<a onclick="showPage('cat-asian')">Asian</a>
+<a onclick="showPage('italian')">Italian</a>
+<a onclick="showPage('cat-desserts')">Desserts</a>
+</div>
+<div class="footer-col">
+<h4>About</h4>
+<a onclick="showPage('about')">About Nagi</a>
+<a onclick="showPage('cookbooks')">My Cookbooks</a>
+<a onclick="showPage('foodbank')">My Food Bank</a>
+<a onclick="showPage('about')">Free Recipe Books</a>
+<a onclick="showPage('about')">Contact</a>
+</div>
+<div class="footer-col">
+<h4>Legal</h4>
+<a onclick="showPage('privacy')">Privacy Policy</a>
+<a onclick="showPage('privacy')">Disclosure</a>
+<a onclick="showPage('privacy')">Recipe Use Policy</a>
+</div>
+</div>
+<div class="footer-bottom">© 2024 RecipeTin Eats — Inspired clone for educational purposes only.</div>
+</footer>
+</div>
+
+<!-- CHEF PICKS PAGE -->
+<div id="chefpicks" class="page">
+<div class="viewall-inner">
+  <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+  <div class="viewall-header">
+    <h1>👨‍🍳 Chef's API Picks</h1>
+    <p>Search exclusive dishes directly from our FastAPI backend.</p>
+    <div style="margin-top:20px; display:flex; gap:10px; max-width:500px;">
+      <input type="text" id="chef-search-input" class="header-search" style="flex:1; width:100%; border-color:#c0502a;" placeholder="Search dishes by name or category..." oninput="performChefSearch()">
+      <button class="btn-hero" onclick="performChefSearch()" style="padding:10px 24px; box-shadow:none;">Search</button>
+    </div>
+  </div>
+  <div class="cards-grid" id="chef-search-results">
+    <p style="color:#888;">Type a search query and press Search.</p>
+  </div>
+</div>
+</div>
+
+<!-- VIEW ALL PAGE -->
+<div id="viewall" class="page">
+<div class="viewall-inner">
+<button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+<div class="viewall-header"><h1>All Recipes</h1><p>15 delicious recipes — from quick weeknight dinners to weekend showstoppers.</p></div>
+<div class="viewall-grid">
+<div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">8</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">6</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">2</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Sides · Bread</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">6</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Desserts · Chocolate</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">3</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">2</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#c0502a,#7a2008)">🍗</div><div class="name-card-body"><div class="name-card-cat">Indian · Curry</div><div class="name-card-title">Chicken Tikka Masala</div><div class="name-card-meta"><span>⏱ 45 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#d4b483,#8a6a2a)">🍝</div><div class="name-card-body"><div class="name-card-cat">Italian · Pasta</div><div class="name-card-title">Spaghetti Carbonara</div><div class="name-card-meta"><span>⏱ 25 min</span><span>👥 2</span></div><span class="coming-soon">Coming Soon</span></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#8b3a2a,#3a1a08)">🥩</div><div class="name-card-body"><div class="name-card-cat">Korean · Beef</div><div class="name-card-title">Korean Beef Rice Bowl</div><div class="name-card-meta"><span>⏱ 20 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#4a7a3a,#1a3a1a)">🥗</div><div class="name-card-body"><div class="name-card-cat">Greek · Salad</div><div class="name-card-title">Classic Greek Salad</div><div class="name-card-meta"><span>⏱ 10 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#7a3a12,#3a1208)">🍖</div><div class="name-card-body"><div class="name-card-cat">BBQ · Slow Cooker</div><div class="name-card-title">BBQ Pulled Pork</div><div class="name-card-meta"><span>⏱ 8 hr</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#6a4a2a,#2a1a0a)">🧁</div><div class="name-card-body"><div class="name-card-cat">Italian · Dessert</div><div class="name-card-title">Classic Tiramisu</div><div class="name-card-meta"><span>⏱ 30 min</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div>
+</div>
+</div>
+
+<!-- ITALIAN PAGE -->
+<div id="italian" class="page">
+<div class="viewall-inner">
+  <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+  <div class="viewall-header"><h1>🇮🇹 Italian Recipes</h1><p>From handmade pasta to slow-roasted classics — all things Italy.</p></div>
+  <div class="viewall-grid">
+    <div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 8</span></div></div></div>
+    <div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Sides</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 6</span></div></div></div>
+    <div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Vegetarian</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+    <div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Dessert</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+    <div class="card" onclick="showPage('limonata')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=600&q=80" alt="Sparkling Limonata"></div><div class="card-body"><div class="card-cat">Italian · Drinks</div><div class="card-title">Sparkling Limonata</div><div class="card-meta"><span>⏱ 8 min</span><span>🍹 4 glasses</span></div></div></div>
+    <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#d4b483,#8a6a2a)">🍝</div><div class="name-card-body"><div class="name-card-cat">Italian · Pasta</div><div class="name-card-title">Spaghetti Carbonara</div><div class="name-card-meta"><span>⏱ 25 min</span><span>👥 2</span></div><span class="coming-soon">Coming Soon</span></div></div>
+    <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#6a4a2a,#2a1a0a)">🧁</div><div class="name-card-body"><div class="name-card-cat">Italian · Dessert</div><div class="name-card-title">Classic Tiramisu</div><div class="name-card-meta"><span>⏱ 30 min</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
+  </div>
+</div>
+</div>
+
+<!-- CATEGORY PAGES -->
+<div id="cat-quickeasy" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>⚡ Quick & Easy</h1><p>Delicious dinners on the table in 30 minutes or less.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
+<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Sides · Bread</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 6</span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+</div></div></div>
+
+<div id="cat-chicken" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍗 Chicken Recipes</h1><p>From weeknight stir-fries to slow-roasted showstoppers.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#c0502a,#7a2008)">🍗</div><div class="name-card-body"><div class="name-card-cat">Indian · Curry</div><div class="name-card-title">Chicken Tikka Masala</div><div class="name-card-meta"><span>⏱ 45 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-beef" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🥩 Beef Recipes</h1><p>Bold, hearty, and deeply satisfying beef dishes.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#8b3a2a,#3a1a08)">🥩</div><div class="name-card-body"><div class="name-card-cat">Korean · Beef</div><div class="name-card-title">Korean Beef Rice Bowl</div><div class="name-card-meta"><span>⏱ 20 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-pasta" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍝 Pasta Recipes</h1><p>From creamy weeknight pasta to classic Italian sauces.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 8</span></div></div></div>
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#d4b483,#8a6a2a)">🍝</div><div class="name-card-body"><div class="name-card-cat">Italian · Pasta</div><div class="name-card-title">Spaghetti Carbonara</div><div class="name-card-meta"><span>⏱ 25 min</span><span>👥 2</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-asian" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍜 Asian Recipes</h1><p>Bold flavours from across Asia — wok-fired and fragrant.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
+</div></div></div>
+
+<div id="cat-mexican" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🌮 Mexican Recipes</h1><p>Fiesta-worthy flavours made fresh at home.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+</div></div></div>
+
+<div id="cat-desserts" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🧁 Desserts</h1><p>Sweet endings to every perfect meal.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Desserts · Chocolate</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#6a4a2a,#2a1a0a)">🧁</div><div class="name-card-body"><div class="name-card-cat">Italian · Dessert</div><div class="name-card-title">Classic Tiramisu</div><div class="name-card-meta"><span>⏱ 30 min</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-soups" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍲 Soups & Stews</h1><p>Warming bowls for cold nights and cozy weekends.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
+</div></div></div>
+
+<div id="cat-onepot" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🫕 One Pot / One Pan</h1><p>All the flavour, minimal washing up.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
+</div></div></div>
+
+<div id="cat-slowcooker" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍲 Slow Cooker</h1><p>Set it, forget it, come home to something incredible.</p></div><div class="viewall-grid">
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#7a3a12,#3a1208)">🍖</div><div class="name-card-body"><div class="name-card-cat">BBQ · Slow Cooker</div><div class="name-card-title">BBQ Pulled Pork</div><div class="name-card-meta"><span>⏱ 8 hr</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-bbq" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🔥 BBQ & Grilling</h1><p>Smoke, char, and that glorious caramelised crust.</p></div><div class="viewall-grid">
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#7a3a12,#3a1208)">🍖</div><div class="name-card-body"><div class="name-card-cat">BBQ · Slow Cooker</div><div class="name-card-title">BBQ Pulled Pork</div><div class="name-card-meta"><span>⏱ 8 hr</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-vegetarian" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🥗 Vegetarian</h1><p>Meatless meals that are anything but boring.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#4a7a3a,#1a3a1a)">🥗</div><div class="name-card-body"><div class="name-card-cat">Greek · Salad</div><div class="name-card-title">Classic Greek Salad</div><div class="name-card-meta"><span>⏱ 10 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-lowcal" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🥦 Low Calorie</h1><p>Light and healthy without compromising on flavour.</p></div><div class="viewall-grid">
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#4a7a3a,#1a3a1a)">🥗</div><div class="name-card-body"><div class="name-card-cat">Greek · Salad</div><div class="name-card-title">Classic Greek Salad</div><div class="name-card-meta"><span>⏱ 10 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<div id="cat-glutenfree" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🌾 Gluten Free</h1><p>All the flavour, none of the gluten.</p></div><div class="viewall-grid">
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+</div></div></div>
+
+<div id="cat-salads" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🥗 Salads</h1><p>Fresh, vibrant, and actually satisfying.</p></div><div class="viewall-grid">
+<div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#4a7a3a,#1a3a1a)">🥗</div><div class="name-card-body"><div class="name-card-cat">Greek · Salad</div><div class="name-card-title">Classic Greek Salad</div><div class="name-card-meta"><span>⏱ 10 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
+</div></div></div>
+
+<!-- ABOUT PAGE -->
+<div id="about" class="page">
+<div class="static-page-inner">
+<button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+<h1>Hi, I'm Deepanshu! 👋</h1>
+<p>I believe you can make great food with everyday ingredients — even if you're short on time and budget. All you need is one good recipe to find your confidence in the kitchen.</p>
+<p>I'm not a chef. I'm a home cook, just like you. I started this blog because I was tired of recipes with 30 ingredients, obscure techniques, and results that never looked like the photos.</p>
+<h2>The RecipeTin Eats Philosophy</h2>
+<p>Every recipe on this site is tested multiple times in a regular home kitchen with no fancy equipment, no hard-to-find ingredients, and no hours of prep. Fast prep. Big flavours. Results you can count on every single time.</p>
+<h2>My Food Bank 🏦</h2>
+<p>A portion of all cookbook proceeds goes directly to feeding families in need. <a onclick="showPage('foodbank')">Learn more about the Food Bank →</a></p>
+<h2>Get In Touch</h2>
+<p>I love hearing from readers! Drop me a note anytime — whether it's a recipe question, a success story, or just to say hello.</p>
+</div>
+</div>
+
+<!-- COOKBOOKS PAGE -->
+<div id="cookbooks" class="page">
+<div class="static-page-inner" style="max-width:1000px;">
+<button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+<h1>📚 My Cookbooks</h1>
+<p>Everything you need to cook with confidence — all in one place.</p>
+<div class="cookbook-grid">
+<div class="cookbook-card"><div class="cb-emoji">🌙</div><h3>"Tonight"</h3><p>Our newest cookbook — 120 recipes for every weeknight. Fast prep, big flavours, guaranteed results.</p><button class="cb-btn" onclick="alert('Order placed! 🎉')">Order Now</button></div>
+<div class="cookbook-card"><div class="cb-emoji">🌍</div><h3>"Around the World"</h3><p>A global feast from your home kitchen. 100 recipes spanning 40 countries, all with everyday ingredients.</p><button class="cb-btn" onclick="alert('Order placed! 🎉')">Order Now</button></div>
+<div class="cookbook-card"><div class="cb-emoji">⚡</div><h3>"30-Minute Dinners"</h3><p>Dinner in 30 minutes or less — without sacrificing an ounce of flavour. 80 weeknight heroes.</p><button class="cb-btn" onclick="alert('Order placed! 🎉')">Order Now</button></div>
+</div>
+</div>
+</div>
+
+<!-- FOOD BANK PAGE -->
+<div id="foodbank" class="page">
+<div class="static-page-inner">
+<button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+<h1>🏦 RecipeTin Food Bank</h1>
+<p>Good food is a right, not a privilege. For every cookbook sold, a meal is donated to a family in need. Here's the impact we've made together.</p>
+<div class="foodbank-stats">
+<div class="fb-stat"><div class="fb-num">248,000</div><div class="fb-label">Meals Donated</div></div>
+<div class="fb-stat"><div class="fb-num">62</div><div class="fb-label">Partner Food Banks</div></div>
+<div class="fb-stat"><div class="fb-num">127</div><div class="fb-label">Countries Reached</div></div>
+</div>
+<p>Every time you buy a cookbook, cook a recipe, or share this site with a friend — you're part of this mission. Thank you for cooking with us.</p>
+<p><a onclick="showPage('cookbooks')">Buy a Cookbook & Feed a Family →</a></p>
+</div>
+</div>
+
+<!-- PRIVACY PAGE -->
+<div id="privacy" class="page">
+<div class="static-page-inner">
+<button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+<h1>Privacy Policy</h1>
+<p>RecipeTin Eats is committed to protecting your privacy. This page outlines how we collect, use, and safeguard your personal information.</p>
+<h2>Data We Collect</h2>
+<p>We collect your email address when you subscribe to our newsletter, and anonymous analytics data to improve our website experience. We never sell your data to third parties.</p>
+<h2>Recipe Use Policy</h2>
+<p>All recipes on this site are original creations. You're welcome to cook them at home and share them with friends. For commercial use or publication, please contact us for permission.</p>
+<h2>Disclosure</h2>
+<p>This site contains no paid advertisements. Cookbook sales may generate a small commission that goes directly to supporting the RecipeTin Food Bank.</p>
+</div>
+</div>
+
+<!-- RECIPE: LASAGNA -->
+<div id="lasagna" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
+<img src="../assets/lasanga.jpeg" class="recipe-hero-img" alt="Lasagna" onerror="this.style.background='linear-gradient(135deg,#c8783a,#7a3a12)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>The Best Homemade Lasagna</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value"><span class="time-qty" data-base-mins="30">30 min</span></div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value"><span class="time-qty" data-base-mins="50">50 min</span></div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value"><span class="time-qty" data-base-mins="80">1 hr 20 min</span></div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value"><span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val" data-base-servings="8">8</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Medium</div></div>
+</div>
+<p class="recipe-intro">Layers of rich meat sauce, creamy béchamel, and perfectly cooked pasta come together in this ultimate comfort dish. This is the lasagna you'll make for every special occasion — and it never disappoints.</p>
+<h2>Ingredients</h2>
+<ul>
+<li><span class="ing-qty" data-base="12">12</span> lasagna sheets (dried or fresh)</li>
+<li><span class="ing-qty" data-base="500">500</span>g (<span class="ing-qty" data-base="1">1</span> lb) ground beef + <span class="ing-qty" data-base="200">200</span>g (<span class="ing-qty" data-base="7">7</span> oz) ground pork</li>
+<li><span class="ing-qty" data-base="1">1</span> large onion, finely diced · <span class="ing-qty" data-base="4">4</span> garlic cloves, minced</li>
+<li><span class="ing-qty" data-base="800">800</span>g (<span class="ing-qty" data-base="28">28</span> oz) crushed tomatoes · <span class="ing-qty" data-base="3">3</span> tbsp tomato paste</li>
+<li><span class="ing-qty" data-base="1">1</span> tsp dried oregano · <span class="ing-qty" data-base="1">1</span> tsp dried basil · salt & pepper</li>
+<li><strong>Béchamel:</strong> <span class="ing-qty" data-base="60">60</span>g butter, <span class="ing-qty" data-base="60">60</span>g flour, <span class="ing-qty" data-base="700">700</span>ml whole milk, pinch of nutmeg</li>
+<li><span class="ing-qty" data-base="250">250</span>g (<span class="ing-qty" data-base="9">9</span> oz) mozzarella, shredded · <span class="ing-qty" data-base="80">80</span>g (<span class="ing-qty" data-base="3">3</span> oz) Parmesan, grated</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Heat olive oil in a large pan over medium-high. Brown beef and pork, breaking it up, about 8 minutes.</li>
+<li>Add onion and garlic, cook 3 minutes. Stir in tomato paste and cook 1 minute.</li>
+<li>Add crushed tomatoes, oregano, basil, salt and pepper. Simmer uncovered 20 minutes until thickened.</li>
+<li>Make béchamel: melt butter, whisk in flour 1 minute, gradually add milk whisking constantly until thick and smooth. Season with nutmeg, salt and pepper.</li>
+<li>Preheat oven to 180°C / 350°F. Spread a thin layer of meat sauce on the base of a 33×22cm baking dish.</li>
+<li>Layer: lasagna sheets → meat sauce → béchamel → mozzarella. Repeat 3 times. Finish with béchamel and Parmesan on top.</li>
+<li>Cover with foil and bake 30 minutes. Remove foil, bake another 20 minutes until golden and bubbling.</li>
+<li>Rest 10 minutes before cutting and serving.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Make the meat sauce a day ahead — the flavour deepens overnight and makes assembly much faster.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Leftovers keep in the fridge for up to 4 days. Freeze tightly wrapped for up to 3 months. Thaw overnight in the fridge before reheating.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/lasanga.mp4" title="The Best Homemade Lasagna Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: BEEF STEW -->
+<div id="beefstew" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
+<img src="../assets/brew.jpeg" class="recipe-hero-img" alt="Beef Stew" onerror="this.style.background='linear-gradient(135deg,#7a3a12,#3a1a08)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Rich & Hearty Beef Stew</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">20 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">2 hr 10 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">2 hr 30 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">6</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro">Tender chunks of beef slow-cooked in a deep, wine-enriched broth with hearty vegetables. This is the kind of stew that fills your kitchen with the most incredible aroma and warms you from the inside out.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>1.2kg (2.5 lb) beef chuck, cut into 4cm cubes</li>
+<li>3 tbsp plain flour · 3 tbsp olive oil</li>
+<li>1 large onion, chopped · 4 garlic cloves, minced</li>
+<li>2 carrots, chunked · 3 celery stalks, sliced</li>
+<li>400ml red wine · 600ml beef stock · 2 tbsp tomato paste</li>
+<li>400g potatoes, quartered · 2 sprigs thyme · 2 bay leaves · salt & pepper</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Pat beef dry, toss in seasoned flour. Brown in batches over high heat, 3 min per side. Set aside.</li>
+<li>Sauté onion and garlic 3 minutes. Add carrots and celery, cook 2 minutes.</li>
+<li>Add wine, scrape up browned bits. Reduce by half, about 4 minutes.</li>
+<li>Add stock, tomato paste, thyme, bay leaves and beef. Bring to a boil.</li>
+<li>Reduce to low, cover and simmer 1.5 hours until beef is almost tender.</li>
+<li>Add potatoes, cook uncovered 30 minutes. Remove herbs and serve.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Brown the beef in batches without crowding — this creates deep caramelised flavour instead of steaming.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Keeps in the fridge 4–5 days and tastes even better the next day. Freeze up to 3 months.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/brew.mp4" title="Rich & Hearty Beef Stew Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: PAD THAI -->
+<div id="padthai" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
+<img src="../assets/thai.jpeg" class="recipe-hero-img" alt="Pad Thai" onerror="this.style.background='linear-gradient(135deg,#c9983a,#7a5a12)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Authentic Pad Thai</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">10 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">10 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">20 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">2</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro">Smoky, tangy, sweet and a little spicy — real Pad Thai made with tamarind paste and fish sauce in under 20 minutes. Skip the takeout; this is the real deal.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>180g dried rice noodles (3–5mm wide)</li>
+<li>200g shrimp or chicken, sliced · 2 eggs</li>
+<li>3 tbsp tamarind paste · 2 tbsp fish sauce · 1 tbsp oyster sauce · 2 tsp sugar</li>
+<li>3 tbsp vegetable oil · 3 garlic cloves, minced · 2 shallots, sliced</li>
+<li>100g bean sprouts · 3 spring onions, chopped</li>
+<li>To serve: crushed peanuts, lime wedges, chilli flakes</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Soak noodles in room temperature water 30 minutes. Drain.</li>
+<li>Mix tamarind, fish sauce, oyster sauce and sugar. Set aside.</li>
+<li>Heat wok over very high heat until smoking. Stir-fry garlic and shallots 30 seconds.</li>
+<li>Add protein, stir-fry 2 minutes. Add noodles and sauce, toss vigorously 1 minute.</li>
+<li>Push to the side, scramble eggs, fold through noodles.</li>
+<li>Add bean sprouts and spring onions, toss 30 seconds. Serve immediately with toppings.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> A screaming hot wok is everything — without it you get soggy steamed noodles, not smoky wok-fried perfection.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Best eaten fresh. Leftovers keep 2 days. Reheat in a hot pan with a splash of water.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/thai.mp4" title="Authentic Pad Thai Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: BUTTER CHICKEN -->
+<div id="butterchicken" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
+<img src="../assets/butter.jpeg" class="recipe-hero-img" alt="Butter Chicken" onerror="this.style.background='linear-gradient(135deg,#c0663a,#7a2a08)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Creamy Butter Chicken</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">15 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">20 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">35 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">4</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro">Velvety tomato-cream sauce hugging tender marinated chicken. This is the butter chicken that converts even the most reluctant curry sceptics — rich, fragrant, and irresistible.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>700g chicken thighs, bite-sized pieces</li>
+<li><strong>Marinade:</strong> 3 tbsp yoghurt, 1 tbsp lemon juice, 1 tsp each cumin/garam masala/turmeric/chilli, salt</li>
+<li>3 tbsp butter · 1 large onion · 5 garlic cloves · 1 tbsp ginger</li>
+<li>1.5 tsp garam masala · 1 tsp cumin · 1 tsp coriander</li>
+<li>400g crushed tomatoes · 1 tbsp sugar · 150ml heavy cream</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Marinate chicken at least 20 minutes. Cook in hot pan until charred. Set aside.</li>
+<li>Cook onion in butter 5 minutes until golden. Add garlic, ginger and spices, cook 2 minutes.</li>
+<li>Add tomatoes and sugar, simmer 10 minutes. Blend until smooth.</li>
+<li>Stir in cream and chicken, simmer 5 minutes. Serve with rice and naan.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Blending the sauce is the secret to that silky, restaurant-quality texture. Don't skip it.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Fridge 4 days. Freeze 3 months. Flavour deepens overnight — great for meal prep.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/Butter.mp4" title="Creamy Butter Chicken Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: GARLIC BREAD -->
+<div id="garlicbread" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
+<img src="../assets/garlic.jpeg" class="recipe-hero-img" alt="Garlic Bread" onerror="this.style.background='linear-gradient(135deg,#c4a96a,#8a6a2a)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Cheesy Garlic Bread</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">5 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">10 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">15 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">6</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro">Golden, crispy, loaded with garlic butter and melted cheese. The side dish that steals the show every single time — nobody can ever eat just one slice.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>1 large baguette or Italian loaf</li>
+<li>120g unsalted butter, softened</li>
+<li>5 garlic cloves, minced · 3 tbsp fresh parsley, chopped · salt & pepper</li>
+<li>150g mozzarella, shredded · 50g Parmesan, grated</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Preheat oven to 200°C / 400°F. Mix butter, garlic, parsley, salt and pepper.</li>
+<li>Halve baguette lengthways. Spread butter generously. Top with both cheeses.</li>
+<li>Bake 8–10 minutes until golden. Grill 1–2 minutes for extra colour. Slice and serve.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Softened (not melted) butter gives you even garlic flavour in every bite — it bakes into the bread rather than pooling.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Prep up to 24 hours ahead, refrigerate unbaked. Re-crisp leftovers at 180°C for 5 minutes.</p>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: LAVA CAKE -->
+<div id="lavacake" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
+<img src="../assets/choco.jpeg" class="recipe-hero-img" alt="Lava Cakes" onerror="this.style.background='linear-gradient(135deg,#5d3a2b,#1a0a05)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Molten Chocolate Lava Cakes</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">10 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">12 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">25 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">4</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Medium</div></div>
+</div>
+<p class="recipe-intro">A perfectly set chocolate shell giving way to a river of warm, gooey molten centre. Incredibly impressive and ready in just 25 minutes.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>200g dark chocolate (70%), chopped · 120g unsalted butter, plus extra for greasing</li>
+<li>3 whole eggs + 3 egg yolks · 100g caster sugar</li>
+<li>40g plain flour · pinch of salt · cocoa powder for dusting</li>
+<li>Vanilla ice cream or whipped cream to serve</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Preheat oven to 220°C / 425°F. Butter 4 ramekins and dust with cocoa powder.</li>
+<li>Melt chocolate and butter together. Stir until smooth. Cool slightly.</li>
+<li>Whisk eggs, yolks and sugar until pale and slightly thickened.</li>
+<li>Fold chocolate into egg mixture. Sift in flour and salt, fold until just combined.</li>
+<li>Divide into ramekins. Bake 10–12 minutes — edges set, centre wobbles.</li>
+<li>Rest 1 minute, run a knife around the edge and invert onto plates. Serve immediately.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Do a test run with one ramekin before your dinner party — every oven varies by 2–3 minutes.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Fill ramekins and refrigerate up to 24 hours. Add 2 extra minutes if baking from cold.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/choco.mp4" title="Molten Chocolate Lava Cakes Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: FRIED RICE -->
+<div id="friedrice" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
+<img src="../assets/fried.jpeg" class="recipe-hero-img" alt="Fried Rice" onerror="this.style.background='linear-gradient(135deg,#b8971f,#6a5a10)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Better-Than-Takeout Fried Rice</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">5 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">10 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">15 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">3</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro">Smoky, savoury fried rice with perfectly separated grains and that signature wok-breath flavour. The weekly fridge-cleaner you'll make forever.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>3 cups day-old cooked rice (cold from fridge)</li>
+<li>2 eggs, lightly beaten · 1 cup frozen peas and corn · 3 spring onions, sliced</li>
+<li>3 garlic cloves, minced · 3 tbsp vegetable oil</li>
+<li>3 tbsp soy sauce · 1 tbsp oyster sauce · 1 tsp sesame oil · ½ tsp white pepper</li>
+<li>Optional: 150g diced protein (pork, shrimp, chicken)</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Mix all sauces together in a small bowl.</li>
+<li>Heat wok over very high heat until smoking. Stir-fry protein if using, set aside.</li>
+<li>Add oil and garlic, stir-fry 20 seconds. Add cold rice, toss vigorously 2 minutes.</li>
+<li>Push rice aside, scramble eggs until just set, fold through rice.</li>
+<li>Add vegetables and protein, toss 1 minute. Add sauce, toss 1 minute. Serve.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Day-old cold rice is non-negotiable — spread on a tray and refrigerate overnight for the best results.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Fridge 3 days. Freeze 1 month. Reheat in hot pan with a splash of water.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/fried rice.mp4" title="Better-Than-Takeout Fried Rice Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: TACOS -->
+<div id="tacos" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
+<img src="../assets/tacos.jpeg" class="recipe-hero-img" alt="Tacos" onerror="this.style.background='linear-gradient(135deg,#c05c2b,#6a2a08)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Crispy Beef Tacos</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">10 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">15 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">25 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">4</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro">Boldly seasoned ground beef in crispy shells piled high with fresh toppings. Fast, fun, and absolutely loaded with flavour — Taco Tuesday just got a serious upgrade.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>500g ground beef · 1 small onion, diced · 3 garlic cloves, minced</li>
+<li><strong>Seasoning:</strong> 1.5 tsp cumin, 1 tsp chilli powder, 1 tsp paprika, ½ tsp oregano, salt & pepper</li>
+<li>3 tbsp tomato paste · 80ml water · 8–12 hard taco shells</li>
+<li><strong>Toppings:</strong> shredded lettuce, diced tomato, cheddar, sour cream, guacamole, jalapeños, lime</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Brown ground beef over high heat until no pink remains, about 5 minutes.</li>
+<li>Add onion and garlic, cook 2 minutes. Add seasoning, cook 1 minute.</li>
+<li>Stir in tomato paste and water, simmer 3 minutes until sauce coats the beef.</li>
+<li>Warm shells at 180°C, fill with beef, add toppings, squeeze lime and serve.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> A tiny pinch of cinnamon in the seasoning adds incredible depth you can't quite put your finger on.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Beef filling keeps 4 days in fridge, freezes 3 months. Store toppings separately.</p>
+</div>
+</div>
+</div>
+
+<!-- RECIPE: MUSHROOM PASTA -->
+<div id="mushroompasta" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
+<img src="../assets/pasta.jpeg" class="recipe-hero-img" alt="Mushroom Pasta" onerror="this.style.background='linear-gradient(135deg,#8d7a5a,#3a2a1a)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Creamy Mushroom Pasta</h1>
+<div class="recipe-meta-bar">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">5 min</div></div>
+<div class="meta-item"><div class="meta-label">Cook Time</div><div class="meta-value">15 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">20 min</div></div>
+<div class="meta-item"><div class="meta-label">Servings</div><div class="meta-value">2</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro">Golden garlicky mushrooms in a silky Parmesan cream sauce tossed through perfectly cooked pasta. This 20-minute vegetarian pasta tastes like a proper Italian restaurant.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>200g fettuccine · 350g mixed mushrooms (cremini, shiitake, oyster), sliced</li>
+<li>3 tbsp unsalted butter · 4 garlic cloves, minced · 1 small shallot, diced</li>
+<li>150ml heavy cream · 50ml dry white wine · 60g Parmesan, grated</li>
+<li>Fresh thyme · salt, pepper, chilli flakes · fresh parsley to serve</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Cook pasta in salted water until al dente. Reserve 1 cup pasta water before draining.</li>
+<li>Brown mushrooms in butter in a single layer, 2 minutes undisturbed. Toss, cook 2 more minutes. Season and set aside.</li>
+<li>Cook shallot and garlic 2 minutes. Add wine, reduce 1 minute. Add cream and thyme, simmer 2 minutes.</li>
+<li>Stir in Parmesan. Add mushrooms and pasta, toss with pasta water until silky. Serve.</li>
+</ol>
+<div class="tip-box"><strong>💡 Pro Tip:</strong> Single layer, no stirring = golden caramelised mushrooms. Crowding = steamed and pale.</div>
+<h2>Storage & Make Ahead</h2>
+<p>Best eaten fresh. Reheat with a splash of cream. Mushrooms can be cooked 2 days ahead.</p>
+</div>
+</div>
+</div>
+
+<!-- DRINK: MANGO LASSI -->
+<div id="mangoLassi" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn drinks-back" onclick="showPage('home')">← Back to Home</button>
+<img src="../assets/mango.jpeg" class="recipe-hero-img" alt="Mango Lassi" onerror="this.style.background='linear-gradient(135deg,#f7d070,#e8a020)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Mango Lassi</h1>
+<div class="recipe-meta-bar drinks-meta">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">5 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">5 min</div></div>
+<div class="meta-item"><div class="meta-label">Serves</div><div class="meta-value">2 glasses</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Very Easy</div></div>
+</div>
+<p class="recipe-intro drink-intro">Thick, creamy and gloriously golden — this mango lassi is the ultimate Indian refresher. Sweet ripe mango meets tangy yoghurt in a glass that feels like a mini holiday every single sip.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>2 ripe mangoes (about 400g pulp) or 400g tinned Alphonso mango pulp</li>
+<li>200g full-fat plain yoghurt (or thick Greek yoghurt)</li>
+<li>100ml whole milk (adjust for consistency)</li>
+<li>2 tbsp sugar or honey, to taste</li>
+<li>4–5 ice cubes · pinch of cardamom powder</li>
+<li>To garnish: dried rose petals, sliver of mango, pinch of cardamom</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>If using fresh mango, peel and roughly chop the flesh. Discard the stone.</li>
+<li>Add mango, yoghurt, milk, sugar and ice to a blender.</li>
+<li>Blend on high for 45–60 seconds until completely smooth and frothy.</li>
+<li>Taste and adjust sweetness. Add more milk if you prefer a thinner consistency.</li>
+<li>Pour into chilled tall glasses. Top with a pinch of cardamom and garnish. Serve immediately.</li>
+</ol>
+<div class="tip-box drink-tip"><strong>🥭 Pro Tip:</strong> Alphonso mango pulp (tinned) is the secret weapon — sweeter and more fragrant than most fresh supermarket mangoes, and available year-round.</div>
+<h2>Variations</h2>
+<p>For a richer lassi, replace milk with more yoghurt. For a vegan version, use coconut yoghurt and oat milk. A pinch of saffron steeped in 1 tbsp warm milk adds incredible depth.</p>
+<h2>Storage</h2>
+<p>Best consumed immediately. Can be refrigerated up to 24 hours — stir well before serving.</p>
+</div>
+</div>
+</div>
+
+<!-- DRINK: MASALA CHAI -->
+<div id="masalachai" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn drinks-back" onclick="showPage('home')">← Back to Home</button>
+<img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=1200&q=85" class="recipe-hero-img" alt="Masala Chai" onerror="this.style.background='linear-gradient(135deg,#c87040,#7a3810)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Masala Chai</h1>
+<div class="recipe-meta-bar drinks-meta">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">2 min</div></div>
+<div class="meta-item"><div class="meta-label">Brew Time</div><div class="meta-value">8 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">10 min</div></div>
+<div class="meta-item"><div class="meta-label">Serves</div><div class="meta-value">2 cups</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro drink-intro">Warming, aromatic and deeply comforting — proper masala chai brewed on the stovetop with whole spices, strong black tea and creamy milk. Exactly how it's made in Indian homes every morning.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>300ml water · 300ml whole milk</li>
+<li>2 tsp strong black tea leaves (Assam or CTC preferred)</li>
+<li>2 tbsp sugar (or to taste)</li>
+<li><strong>Whole Spices:</strong> 4 green cardamom pods (lightly crushed), 2 cloves, 1 small cinnamon stick, 1 thin slice fresh ginger, 2 black peppercorns</li>
+<li>Optional: pinch of nutmeg, 1 star anise</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Add water to a small saucepan over medium heat. Add all whole spices and ginger.</li>
+<li>Bring to a gentle boil and simmer 3 minutes to release the spice flavours.</li>
+<li>Add tea leaves and simmer 1 minute, stirring occasionally.</li>
+<li>Pour in the milk and bring back to a boil, stirring frequently to prevent sticking.</li>
+<li>Once it rises to a boil, reduce heat and simmer 2 minutes. Add sugar, stir to dissolve.</li>
+<li>Strain through a fine mesh sieve into cups. Serve steaming hot.</li>
+</ol>
+<div class="tip-box drink-tip"><strong>☕ Pro Tip:</strong> Let it boil up and come back down twice — this traditional technique gives chai its distinct layered flavour and characteristic frothy top.</div>
+<h2>Spice Notes</h2>
+<p>Start with the base spices (cardamom, ginger, clove) and build from there. Too much cinnamon can make it bitter. More milk = creamier and milder; less milk = stronger brew.</p>
+<h2>Storage</h2>
+<p>Best made fresh. Refrigerate brewed chai up to 2 days and reheat gently on the stovetop — do not microwave.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/Chai.mp4" title="Masala Chai Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- DRINK: SPARKLING LIMONATA -->
+<div id="limonata" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn drinks-back" onclick="showPage('italian')">← Back to Italian Recipes</button>
+<img src="https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=1200&q=85" class="recipe-hero-img" alt="Sparkling Limonata" onerror="this.style.background='linear-gradient(135deg,#d4e840,#8aaa10)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Sparkling Limonata</h1>
+<div class="recipe-meta-bar drinks-meta">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">5 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">8 min</div></div>
+<div class="meta-item"><div class="meta-label">Serves</div><div class="meta-value">4 glasses</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Very Easy</div></div>
+</div>
+<p class="recipe-intro drink-intro">Bright, fizzy and perfectly balanced between tart and sweet — this Italian-style sparkling lemonade is everything a summer drink should be. Made with fresh lemon juice and a simple herb syrup.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>150ml freshly squeezed lemon juice (about 5–6 lemons)</li>
+<li>500ml sparkling water, chilled · plenty of ice</li>
+<li><strong>Simple Syrup:</strong> 100g sugar, 100ml water, 4 sprigs fresh mint or basil</li>
+<li>To garnish: lemon slices, fresh mint, edible flowers (optional)</li>
+</ul>
+<h2>Instructions</h2>
+<ol>
+<li>Make the syrup: combine sugar and water in a small saucepan over medium heat. Stir until dissolved, about 2 minutes. Remove from heat, add mint/basil, steep 5 minutes. Strain and cool completely.</li>
+<li>In a large jug, combine lemon juice and cooled syrup. Stir well.</li>
+<li>Fill glasses generously with ice. Pour lemon mixture halfway, top with sparkling water.</li>
+<li>Stir gently just once to preserve bubbles. Garnish and serve immediately.</li>
+</ol>
+<div class="tip-box drink-tip"><strong>🍋 Pro Tip:</strong> Roll the lemons firmly on the bench before squeezing — this breaks down the inner membranes and almost doubles the juice you get out.</div>
+<h2>Variations</h2>
+<p>Add fresh raspberries to the syrup for a berry limonata. For an adult version, replace half the sparkling water with Prosecco. Rosemary in the syrup instead of mint gives an elegant herbal note.</p>
+<h2>Storage</h2>
+<p>The lemon-syrup base keeps in the fridge up to 5 days. Only add sparkling water just before serving.</p>
+<h2>Video Tutorial</h2>
+<div class="video-container">
+<iframe width="100%" height="450" mute src="../assets/limonta.mp4" title="Sparkling Limonata Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- DRINK: MATCHA ROSE LATTE -->
+<div id="matcharose" class="page">
+<div class="recipe-page-inner">
+<button class="back-btn drinks-back" onclick="showPage('home')">← Back to Home</button>
+<img src="https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?w=1200&q=85" class="recipe-hero-img" alt="Matcha Rose Latte" onerror="this.style.background='linear-gradient(135deg,#5aaa70,#1a6a30)';this.removeAttribute('src')">
+<div class="recipe-content">
+<h1>Matcha Rose Latte</h1>
+<div class="recipe-meta-bar drinks-meta">
+<div class="meta-item"><div class="meta-label">Prep Time</div><div class="meta-value">3 min</div></div>
+<div class="meta-item"><div class="meta-label">Make Time</div><div class="meta-value">4 min</div></div>
+<div class="meta-item"><div class="meta-label">Total Time</div><div class="meta-value">7 min</div></div>
+<div class="meta-item"><div class="meta-label">Serves</div><div class="meta-value">1 glass</div></div>
+<div class="meta-item"><div class="meta-label">Difficulty</div><div class="meta-value">Easy</div></div>
+</div>
+<p class="recipe-intro drink-intro">Earthy ceremonial-grade matcha meets the gentle floral sweetness of rose — poured over ice or steamed milk for one of the most beautiful drinks you can make at home. Café-worthy in under 10 minutes.</p>
+<h2>Ingredients</h2>
+<ul>
+<li>1½ tsp ceremonial-grade matcha powder</li>
+<li>2 tbsp hot water (80°C — not boiling)</li>
+<li>250ml oat milk or whole milk</li>
+<li>1–2 tsp rose syrup (or 1 tsp rose water + 1 tsp sugar)</li>
+<li>Ice (for iced version)</li>
+<li>To garnish: dried rose petals, dusting of matcha</li>
+</ul>
+<h2>Instructions — Iced Version</h2>
+<ol>
+<li>Sift matcha into a small bowl. Add 2 tbsp of 80°C water.</li>
+<li>Whisk vigorously in a W-motion until smooth, frothy and no lumps remain, about 30–45 seconds.</li>
+<li>Stir in rose syrup.</li>
+<li>Fill a glass to the brim with ice. Pour cold milk over ice.</li>
+<li>Slowly pour the matcha mixture over the back of a spoon for a beautiful layered effect.</li>
+<li>Garnish with dried rose petals and a dusting of matcha. Stir before drinking.</li>
+</ol>
+<h2>Instructions — Hot Version</h2>
+<ol>
+<li>Whisk matcha and hot water as above. Stir in rose syrup.</li>
+<li>Steam or heat milk until hot and frothy.</li>
+<li>Pour matcha into your cup, then slowly pour over steamed milk. Garnish and serve.</li>
+</ol>
+<div class="tip-box drink-tip"><strong>🍵 Pro Tip:</strong> Never use boiling water for matcha — above 85°C it turns bitter and destroys the amino acids that give it that signature umami sweetness.</div>
+<h2>Storage</h2>
+<p>Best made fresh. The matcha-rose concentrate (before adding milk) can be kept in the fridge up to 12 hours.</p>
+</div>
+</div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div id="quiz" class="page">
+  <div class="static-page-inner" style="max-width: 700px; text-align: center;">
+    <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+    <div id="quiz-container">
+      <h1>🎯 Dish Finder Quiz</h1>
+      <p>Answer 5 quick questions and we'll tell you what to eat!</p>
+      
+      <div id="quiz-questions-wrapper" style="margin-top: 40px; min-height: 300px;">
+        <!-- Questions will be injected here by JS -->
+      </div>
+      
+      <div id="quiz-progress" style="margin-top: 30px; height: 6px; background: #eee; border-radius: 3px; overflow: hidden;">
+        <div id="quiz-progress-bar" style="height: 100%; background: #c0502a; width: 0%; transition: width 0.3s;"></div>
+      </div>
+    </div>
+
+    <div id="quiz-result" style="display: none; margin-top: 40px; animation: heroFade 0.6s ease both;">
+      <h2>🎉 Your Perfect Match is...</h2>
+      <div id="recommended-dish-container" style="max-width: 350px; margin: 30px auto;">
+        <!-- Recommended card will appear here -->
+      </div>
+      <button class="btn-hero" onclick="restartQuiz()" style="margin-top: 20px; background: #555;">Try Again</button>
+    </div>
+  </div>
+</div>
+
+<script src="index.js"></script>
+</body>
+</html>

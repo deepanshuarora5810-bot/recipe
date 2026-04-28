@@ -1,0 +1,720 @@
+:root {
+  --cream: #fdf8f3;
+  --warm-white: #fff9f4;
+  --rust: #c0392b;
+  --rust-light: #e74c3c;
+  --rust-dark: #922b21;
+  --olive: #6b7c4e;
+  --brown: #5d4037;
+  --tan: #d4a96a;
+  --text-dark: #2c1a0e;
+  --text-mid: #5a3e2b;
+  --text-light: #9e7b5a;
+  --border: #e8ddd0;
+  --shadow: rgba(44,26,14,0.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Lato', sans-serif;
+  background: var(--cream);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--rust);
+  color: #fff;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  font-weight: 700;
+}
+.topbar a { color: #ffd; text-decoration: underline; }
+
+/* ── HEADER ── */
+header {
+  background: var(--warm-white);
+  border-bottom: 2px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+.logo {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+}
+.logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--rust);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+nav { display: flex; gap: 4px; align-items: center; }
+
+nav > a,
+.dropdown > a {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dark);
+  text-decoration: none;
+  padding: 20px 12px;
+  display: block;
+  transition: color 0.2s;
+}
+nav > a:hover,
+.dropdown:hover > a { color: var(--rust); }
+
+.dropdown { position: relative; }
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px var(--shadow);
+  min-width: 200px;
+  z-index: 200;
+  padding: 8px 0;
+}
+.dropdown:hover .dropdown-menu { display: block; }
+
+.dropdown-menu a {
+  display: block;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-dark);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.dropdown-menu a:hover {
+  background: var(--cream);
+  color: var(--rust);
+}
+
+.header-search {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-family: 'Lato', sans-serif;
+  color: var(--text-dark);
+  outline: none;
+  width: 180px;
+  transition: border-color 0.2s;
+}
+.header-search:focus { border-color: var(--rust); }
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  height: 520px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3a1f0d 0%, #6b3a1f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 30% 50%, rgba(192,57,43,0.35) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(212,169,106,0.2) 0%, transparent 50%),
+    url('https://www.recipetineats.com/tachyon/2020/09/Chicken-Parmigiana_7.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.55) saturate(1.1);
+}
+.hero-content {
+  position: relative;
+  text-align: center;
+  color: #fff;
+  padding: 20px;
+  animation: heroFade 0.9s ease both;
+}
+
+@keyframes heroFade {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-tag {
+  display: inline-block;
+  background: var(--rust);
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 2px;
+  margin-bottom: 18px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.1;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  margin-bottom: 14px;
+  max-width: 700px;
+}
+.hero p {
+  font-size: 16px;
+  opacity: 0.88;
+  margin-bottom: 26px;
+  font-weight: 300;
+  letter-spacing: 0.3px;
+}
+.btn-hero {
+  display: inline-block;
+  background: var(--rust);
+  color: #fff;
+  text-decoration: none;
+  padding: 13px 32px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 18px rgba(192,57,43,0.45);
+}
+.btn-hero:hover {
+  background: var(--rust-dark);
+  transform: translateY(-2px);
+}
+
+/* ── SECTIONS ── */
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 36px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 14px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.section-link {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rust);
+  text-decoration: none;
+  margin-left: auto;
+}
+.section-link:hover { text-decoration: underline; }
+
+/* ── RECIPE CARDS ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 28px;
+}
+.card {
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px var(--shadow);
+}
+.card-img-wrap { overflow: hidden; }
+.card-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+  background: var(--border);
+  transition: transform 0.35s;
+}
+.card:hover .card-img { transform: scale(1.04); }
+.card-body { padding: 16px 18px 20px; }
+.card-cat {
+  font-size: 10.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--rust);
+  margin-bottom: 7px;
+}
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+.card-meta {
+  font-size: 12px;
+  color: var(--text-light);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cream);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  margin-left: 4px;
+}
+.qty-btn {
+  background: none;
+  border: none;
+  color: var(--rust);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 14px;
+  line-height: 1;
+}
+.qty-btn:hover {
+  background: var(--rust);
+  color: #fff;
+  border-radius: 2px;
+}
+.qty-val {
+  font-weight: 700;
+  color: var(--text-dark);
+  min-width: 12px;
+  text-align: center;
+}
+
+.ing-qty, .time-qty {
+  font-weight: 700;
+  color: var(--rust);
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+.ing-qty.updated, .time-qty.updated {
+  transform: scale(1.2);
+}
+
+/* ── FEATURED GRID ── */
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+.featured-grid .card-img { aspect-ratio: 16/10; }
+
+/* ── CATEGORY PILLS ── */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 48px;
+}
+.pill {
+  display: inline-block;
+  padding: 8px 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-mid);
+  text-decoration: none;
+  transition: all 0.18s;
+  background: #fff;
+}
+.pill:hover {
+  border-color: var(--rust);
+  color: var(--rust);
+  background: #fff5f3;
+}
+
+/* ── BANNER STRIP ── */
+.banner-strip {
+  background: var(--rust);
+  padding: 40px 24px;
+  text-align: center;
+  margin: 20px 0;
+}
+.banner-strip h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.banner-strip p {
+  color: rgba(255,255,255,0.85);
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+.btn-white {
+  display: inline-block;
+  background: #fff;
+  color: var(--rust);
+  padding: 11px 28px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn-white:hover { background: #ffeaea; }
+
+/* ── ABOUT STRIP ── */
+.about-strip {
+  background: var(--warm-white);
+  border-top: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  padding: 48px 24px;
+}
+.about-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+.about-img {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 4px solid var(--tan);
+  box-shadow: 0 4px 18px var(--shadow);
+  background: var(--border);
+}
+.about-text h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+.about-text p {
+  font-size: 14.5px;
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+.about-text a {
+  color: var(--rust);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ── NEWSLETTER ── */
+.newsletter {
+  background: #2c1a0e;
+  color: #fff;
+  padding: 56px 24px;
+  text-align: center;
+}
+.newsletter h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+.newsletter p {
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+.nl-form {
+  display: flex;
+  gap: 10px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.nl-input {
+  flex: 1;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+  outline: none;
+}
+.nl-btn {
+  background: var(--rust);
+  color: #fff;
+  border: none;
+  padding: 13px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.nl-btn:hover { background: var(--rust-dark); }
+
+/* ── FOOTER ── */
+footer {
+  background: #1e1208;
+  color: rgba(255,255,255,0.6);
+  padding: 48px 24px 28px;
+}
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 36px;
+}
+.footer-brand .logo-text { color: #fff; font-size: 22px; }
+.footer-brand .logo-sub { color: rgba(255,255,255,0.4); }
+.footer-brand p {
+  font-size: 13px;
+  line-height: 1.7;
+  margin-top: 14px;
+  color: rgba(255,255,255,0.5);
+}
+.footer-col h4 {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--tan);
+  margin-bottom: 14px;
+}
+.footer-col a {
+  display: block;
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  margin-bottom: 8px;
+  transition: color 0.15s;
+}
+.footer-col a:hover { color: #fff; }
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 20px;
+  font-size: 12px;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { display: none; }
+  .featured-grid { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .about-inner { flex-direction: column; text-align: center; }
+}
+/* ── QUIZ STYLES ── */
+.quiz-question-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  margin-bottom: 24px;
+  color: var(--text-dark);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.quiz-option {
+  background: #fff;
+  border: 2px solid var(--border);
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.quiz-option:hover {
+  border-color: var(--rust);
+  background: #fff5f3;
+  transform: translateX(5px);
+}
+.quiz-option.selected {
+  background: var(--rust);
+  color: #fff;
+  border-color: var(--rust);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.quiz-question-box {
+  animation: slideIn 0.4s ease both;
+}
+
+@media (max-width: 600px) {
+  .quiz-option { padding: 12px 18px; font-size: 14px; }
+}
+```
+
+---
+
+
+
+
+
+
+/* ── SMART SUBSTITUTIONS ── */
+.sub-trigger {
+  border-bottom: 1.5px dotted var(--rust);
+  cursor: help;
+  position: relative;
+  transition: color 0.2s;
+}
+.sub-trigger:hover {
+  color: var(--rust);
+  background: #fff5f3;
+}
+.sub-trigger::after {
+  content: ' 💡';
+  font-size: 10px;
+  vertical-align: super;
+  opacity: 0.6;
+}
+
+/* ── COOKING TIMERS ── */
+.timer-btn {
+  background: var(--rust);
+  color: #fff;
+  border: 1px solid var(--rust-dark);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 8px;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+  font-family: 'Lato', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.timer-btn:hover {
+  background: var(--rust-dark);
+  border-color: var(--rust-dark);
+}
+.timer-display {
+  background: var(--rust);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 8px;
+  vertical-align: middle;
+  font-family: monospace;
+  min-width: 60px;
+  justify-content: center;
+  align-items: center;
+}
+.timer-done {
+  background: var(--olive);
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+/* ── NUTRITION CALCULATOR ── */
+.nutrition-box {
+  background: var(--warm-white);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.nutrition-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 8px;
+  color: var(--text-dark);
+}
+.nutrition-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.nut-item {
+  text-align: center;
+  flex: 1;
+}
+.nut-val {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--rust);
+  font-family: 'Lato', sans-serif;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+.nut-val.updated {
+  transform: scale(1.3);
+}
+.nut-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-top: 4px;
+}
