@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RecipeTin Eats – Fast Prep, Big Flavours</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
+<!-- Reading Progress Bar -->
+<div id="reading-progress-bar" style="position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#c0502a,#e8960a);z-index:9999;transition:width 0.1s linear;pointer-events:none;"></div>
 <style>
 .page { display: none; }
 .page.active { display: block; }
@@ -120,6 +122,120 @@
 .fb-stat:last-child { border-right:none; }
 .fb-stat .fb-num { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:#c0502a; }
 .fb-stat .fb-label { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#999; margin-top:4px; }
+/* DARK MODE */
+body.dark-mode { background:#1a1612; color:#e8e0d5; }
+body.dark-mode header { background:#111; border-bottom-color:#333; }
+body.dark-mode .card { background:#231e1a; border-color:#3a3028; }
+body.dark-mode .card-title { color:#e8e0d5; }
+body.dark-mode .card-cat { color:#e89060; }
+body.dark-mode .card-meta { color:#aaa; }
+body.dark-mode .section-title { color:#e8e0d5; }
+body.dark-mode .viewall-header h1 { color:#e8e0d5; }
+body.dark-mode .viewall-inner { color:#e8e0d5; }
+body.dark-mode .recipe-page-inner { color:#e8e0d5; }
+body.dark-mode .recipe-meta-bar { background:#231e1a; border-color:#3a3028; }
+body.dark-mode .tip-box { background:#231e1a; border-color:#7a4a20; }
+body.dark-mode .name-card { background:#231e1a; border-color:#3a3028; }
+body.dark-mode .name-card-title { color:#e8e0d5; }
+body.dark-mode .reviews-section { background:#1f1a16; border-top-color:#3a3028; }
+body.dark-mode .review-card { background:#231e1a; border-color:#3a3028; }
+body.dark-mode .review-text { color:#ccc; }
+body.dark-mode .reviews-stats { background:#231e1a; border-color:#3a3028; }
+body.dark-mode .static-page-inner p { color:#ccc; }
+body.dark-mode .static-page-inner h1,.static-page-inner h2 { color:#e8e0d5; }
+body.dark-mode .cookbook-card { background:#231e1a; border-color:#3a3028; }
+body.dark-mode .cookbook-card h3 { color:#e8e0d5; }
+body.dark-mode .cookbook-card p { color:#ccc; }
+body.dark-mode .newsletter { background:#231e1a; }
+body.dark-mode footer { background:#111; border-top-color:#333; }
+body.dark-mode .footer-brand p { color:#aaa; }
+body.dark-mode .footer-col a { color:#bbb; }
+body.dark-mode .dropdown-menu { background:#1a1612; border-color:#3a3028; }
+body.dark-mode .dropdown-menu a:hover { background:#2a1e14; }
+body.dark-mode .pills { border-bottom-color:#3a3028; }
+body.dark-mode .pill { background:#231e1a; border-color:#3a3028; color:#ccc; }
+body.dark-mode .viewall-header p { color:#aaa; }
+body.dark-mode .about-strip { background:#231e1a; }
+body.dark-mode .about-text h3 { color:#e8e0d5; }
+body.dark-mode .about-text p, .about-text a { color:#ccc; }
+/* DARK MODE TOGGLE BTN */
+#dark-mode-btn { background:transparent; border:2px solid rgba(255,255,255,0.3); color:#fff; cursor:pointer; padding:5px 10px; border-radius:20px; font-size:14px; transition:all .2s; font-family:'Lato',sans-serif; }
+#dark-mode-btn:hover { background:rgba(255,255,255,0.15); }
+/* FAVOURITES */
+.fav-btn { background:transparent; border:none; cursor:pointer; font-size:22px; padding:4px 6px; transition:transform 0.2s; display:inline-block; }
+.fav-btn:hover { transform:scale(1.25); }
+.fav-btn.active { animation:heartPop 0.3s ease; }
+@keyframes heartPop { 0%{transform:scale(1)} 50%{transform:scale(1.5)} 100%{transform:scale(1)} }
+.recipe-fav-bar { display:flex; align-items:center; justify-content:space-between; margin:0 0 18px; }
+.share-btn { display:inline-flex; align-items:center; gap:6px; background:transparent; border:2px solid #c0502a; color:#c0502a; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:7px 16px; cursor:pointer; font-family:'Lato',sans-serif; transition:all .2s; }
+.share-btn:hover { background:#c0502a; color:#fff; }
+/* TOAST */
+#toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(30px); background:#1a1a1a; color:#fff; padding:12px 26px; border-radius:4px; font-size:14px; font-weight:700; font-family:'Lato',sans-serif; opacity:0; transition:all 0.35s ease; z-index:9998; pointer-events:none; }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+/* FAVOURITES PAGE */
+#favourites .viewall-inner { } 
+.empty-favs { text-align:center; padding:60px 20px; color:#888; }
+.empty-favs .ef-emoji { font-size:64px; margin-bottom:16px; }
+.empty-favs p { font-size:17px; line-height:1.7; }
+/* SCROLL TO TOP */
+#scroll-top-btn { position:fixed; bottom:80px; right:30px; width:46px; height:46px; border-radius:50%; background:#c0502a; color:#fff; border:none; cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(0); transition:all 0.3s; z-index:999; box-shadow:0 4px 16px rgba(192,80,42,0.4); }
+#scroll-top-btn.visible { opacity:1; transform:scale(1); }
+#scroll-top-btn:hover { background:#a03e1e; transform:scale(1.1); }
+/* STAT COUNTER ANIMATION */
+.stat-number { transition:color 0.3s; }
+/* FLOATING HEART ON CARDS */
+.card-img-wrap { position: relative; }
+.floating-fav-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.2s; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.floating-fav-btn:hover { transform: scale(1.15); background: #fff; }
+.floating-fav-btn.active { color: #c0502a; }
+body.dark-mode .floating-fav-btn { background: rgba(35,30,26,0.9); color: #ccc; }
+body.dark-mode .floating-fav-btn.active { color: #e89060; }
+/* SETTINGS PAGE STYLES */
+.settings-header { margin-bottom: 40px; border-bottom: 2px solid #e8e0d5; padding-bottom: 20px; }
+.settings-header h1 { font-size: 32px; margin-bottom: 8px; }
+.settings-header p { color: #888; font-size: 16px; }
+.settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 32px; margin-bottom: 48px; }
+.settings-section { background: #fff; border: 2px solid #e8e0d5; padding: 24px; transition: all 0.3s ease; }
+.settings-section:hover { border-color: #c0502a; box-shadow: 0 8px 24px rgba(192,80,42,0.05); }
+.settings-sec-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #1a1a1a; display: flex; align-items: center; gap: 10px; }
+.settings-group { display: flex; flex-direction: column; gap: 20px; }
+.settings-field { display: flex; flex-direction: column; gap: 8px; }
+.settings-field.row { flex-direction: row; justify-content: space-between; align-items: center; }
+.settings-field label { font-size: 13px; font-weight: 700; color: #c0502a; text-transform: uppercase; letter-spacing: 0.05em; }
+.field-label strong { display: block; font-size: 15px; color: #1a1a1a; }
+.field-label p { font-size: 12px; color: #888; margin-top: 2px; }
+.settings-input { padding: 12px 16px; border: 2px solid #e8e0d5; font-family: 'Lato', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; }
+.settings-input:focus { border-color: #c0502a; }
+.settings-btn { background: #c0502a; color: #fff; border: none; padding: 12px 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; transition: all 0.2s; font-family: 'Lato', sans-serif; }
+.settings-btn:hover { background: #a03e1e; transform: translateY(-2px); }
+.settings-btn.secondary { background: transparent; border: 2px solid #ddd; color: #888; }
+.settings-btn.secondary:hover { background: #f5f5f5; border-color: #999; color: #666; }
+.segmented-control { display: flex; border: 2px solid #e8e0d5; background: #fafafa; }
+.segmented-control label { flex: 1; text-align: center; cursor: pointer; margin: 0; padding: 0; }
+.segmented-control input { display: none; }
+.segmented-control span { display: block; padding: 10px; font-size: 13px; font-weight: 700; color: #888; transition: all 0.2s; text-transform: none; letter-spacing: 0; }
+.segmented-control input:checked + span { background: #c0502a; color: #fff; }
+/* Toggle Switch */
+.toggle-wrap input[type="checkbox"] { appearance: none; width: 44px; height: 24px; background: #ddd; border-radius: 12px; position: relative; cursor: pointer; transition: background 0.3s; }
+.toggle-wrap input[type="checkbox"]:checked { background: #c0502a; }
+.toggle-wrap input[type="checkbox"]::before { content: ''; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: transform 0.3s; }
+.toggle-wrap input[type="checkbox"]:checked::before { transform: translateX(20px); }
+.settings-footer { text-align: center; border-top: 2px solid #e8e0d5; padding-top: 40px; }
+
+body.dark-mode .settings-section { background: #231e1a; border-color: #3a3028; }
+body.dark-mode .settings-sec-title { color: #e8e0d5; }
+body.dark-mode .field-label strong { color: #e8e0d5; }
+body.dark-mode .settings-input { background: #1a1612; border-color: #3a3028; color: #e8e0d5; }
+body.dark-mode .segmented-control { background: #1a1612; border-color: #3a3028; }
+body.dark-mode .segmented-control span { color: #aaa; }
+body.dark-mode .settings-btn.secondary { border-color: #3a3028; color: #aaa; }
+body.dark-mode .settings-header { border-bottom-color: #3a3028; }
+body.dark-mode .settings-footer { border-top-color: #3a3028; }
+
+/* Font Size Utility Classes */
+body.font-small { font-size: 14px; }
+body.font-medium { font-size: 16px; }
+body.font-large { font-size: 18px; }
 </style>
 </head>
 <body>
@@ -163,8 +279,10 @@
 <a onclick="showPage('quiz')" style="color:#c0502a;font-weight:700;">🎯 Dish Finder</a>
 <a onclick="showPage('cookbooks')">Cookbooks</a>
 <a onclick="showPage('foodbank')">My Food Bank</a>
-<a onclick="showPage('chefpicks')" style="color:#c0502a;font-weight:700;">👨‍🍳 Chef Picks</a>
+<a onclick="showPage('favourites')" style="color:#c0502a;font-weight:700;" id="fav-nav-link">❤️ Favourites <span id="fav-nav-count" style="display:none;background:#c0502a;color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;">0</span></a>
+<a onclick="showPage('settings')" style="cursor:pointer" title="Settings">⚙️</a>
 </nav>
+<button id="dark-mode-btn" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
 <input id="search-input" class="header-search" type="search" placeholder="🔍  Search recipes…">
 </div>
 </header>
@@ -204,7 +322,7 @@
 <div class="featured-grid">
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('lasagna')">
-<img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Italian · Pasta</div>
@@ -214,7 +332,7 @@
 </div>
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('beefstew')">
-<img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Beef · Comfort Food</div>
@@ -226,7 +344,7 @@
 <div class="cards-grid">
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('padthai')">
-<img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Thai · Quick</div>
@@ -236,7 +354,7 @@
 </div>
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('butterchicken')">
-<img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Indian · Curry</div>
@@ -246,7 +364,7 @@
 </div>
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('garlicbread')">
-<img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Sides · Bread</div>
@@ -256,7 +374,7 @@
 </div>
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('lavacake')">
-<img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Desserts · Chocolate</div>
@@ -279,7 +397,7 @@
 <div class="cards-grid">
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('friedrice')">
-<img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Asian · Rice</div>
@@ -289,7 +407,7 @@
 </div>
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('tacos')">
-<img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Mexican · Quick</div>
@@ -299,7 +417,7 @@
 </div>
 <div class="card">
 <div class="card-img-wrap" onclick="showPage('mushroompasta')">
-<img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')">
+<img class="card-img" src="../assets/images/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')">
 </div>
 <div class="card-body">
 <div class="card-cat">Vegetarian · Pasta</div>
@@ -331,7 +449,7 @@
 <div class="cards-grid">
 <div class="card" onclick="showPage('mangoLassi')">
 <div class="drink-img-wrap">
-<img src="../assets/mango.jpeg" alt="Mango Lassi" onerror="this.parentElement.innerHTML='<div style=\'width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#f7d070,#e8a020);display:flex;align-items:center;justify-content:center;font-size:52px;\'>🥭</div>'">
+<img src="../assets/images/mango.jpeg" alt="Mango Lassi" onerror="this.parentElement.innerHTML='<div style=\'width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#f7d070,#e8a020);display:flex;align-items:center;justify-content:center;font-size:52px;\'>🥭</div>'">
 </div>
 <div class="card-body">
 <div class="card-cat">Indian · Mocktail</div>
@@ -513,22 +631,26 @@
 <div class="footer-bottom">© 2024 RecipeTin Eats — Inspired clone for educational purposes only.</div>
 </footer>
 </div>
+<!-- TOAST NOTIFICATION -->
+<div id="toast"></div>
+<!-- SCROLL TO TOP -->
+<button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
-<!-- CHEF PICKS PAGE -->
-<div id="chefpicks" class="page">
+<!-- FAVOURITES PAGE -->
+<div id="favourites" class="page">
 <div class="viewall-inner">
-  <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
-  <div class="viewall-header">
-    <h1>👨‍🍳 Chef's API Picks</h1>
-    <p>Search exclusive dishes directly from our FastAPI backend.</p>
-    <div style="margin-top:20px; display:flex; gap:10px; max-width:500px;">
-      <input type="text" id="chef-search-input" class="header-search" style="flex:1; width:100%; border-color:#c0502a;" placeholder="Search dishes by name or category..." oninput="performChefSearch()">
-      <button class="btn-hero" onclick="performChefSearch()" style="padding:10px 24px; box-shadow:none;">Search</button>
-    </div>
-  </div>
-  <div class="cards-grid" id="chef-search-results">
-    <p style="color:#888;">Type a search query and press Search.</p>
-  </div>
+<button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+<div class="viewall-header">
+  <h1>❤️ My Favourites</h1>
+  <p id="favs-subtitle">Your saved recipes — all in one place.</p>
+</div>
+<div class="viewall-grid" id="favs-grid">
+  <!-- Populated by JS -->
+</div>
+<div id="favs-empty" class="empty-favs" style="display:none;">
+  <div class="ef-emoji">💔</div>
+  <p>You haven't saved any recipes yet.<br>Tap the <strong>❤️</strong> button on any recipe to save it here!</p>
+</div>
 </div>
 </div>
 
@@ -538,15 +660,15 @@
 <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
 <div class="viewall-header"><h1>All Recipes</h1><p>15 delicious recipes — from quick weeknight dinners to weekend showstoppers.</p></div>
 <div class="viewall-grid">
-<div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">8</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">6</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">2</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Sides · Bread</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">6</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Desserts · Chocolate</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">3</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
-<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">2</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">8</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">6</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">2</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Sides · Bread</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">6</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Desserts · Chocolate</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">3</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">4</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 <span class="qty-controls"><button class="qty-btn" onclick="updateQty(this, -1, event)">-</button><span class="qty-val">2</span><button class="qty-btn" onclick="updateQty(this, 1, event)">+</button></span></span></div></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#c0502a,#7a2008)">🍗</div><div class="name-card-body"><div class="name-card-cat">Indian · Curry</div><div class="name-card-title">Chicken Tikka Masala</div><div class="name-card-meta"><span>⏱ 45 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#d4b483,#8a6a2a)">🍝</div><div class="name-card-body"><div class="name-card-cat">Italian · Pasta</div><div class="name-card-title">Spaghetti Carbonara</div><div class="name-card-meta"><span>⏱ 25 min</span><span>👥 2</span></div><span class="coming-soon">Coming Soon</span></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#8b3a2a,#3a1a08)">🥩</div><div class="name-card-body"><div class="name-card-cat">Korean · Beef</div><div class="name-card-title">Korean Beef Rice Bowl</div><div class="name-card-meta"><span>⏱ 20 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
@@ -563,10 +685,10 @@
   <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
   <div class="viewall-header"><h1>🇮🇹 Italian Recipes</h1><p>From handmade pasta to slow-roasted classics — all things Italy.</p></div>
   <div class="viewall-grid">
-    <div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 8</span></div></div></div>
-    <div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Sides</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 6</span></div></div></div>
-    <div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Vegetarian</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
-    <div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Dessert</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+    <div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 8</span></div></div></div>
+    <div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Sides</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 6</span></div></div></div>
+    <div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Vegetarian</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+    <div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Dessert</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
     <div class="card" onclick="showPage('limonata')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=600&q=80" alt="Sparkling Limonata"></div><div class="card-body"><div class="card-cat">Italian · Drinks</div><div class="card-title">Sparkling Limonata</div><div class="card-meta"><span>⏱ 8 min</span><span>🍹 4 glasses</span></div></div></div>
     <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#d4b483,#8a6a2a)">🍝</div><div class="name-card-body"><div class="name-card-cat">Italian · Pasta</div><div class="name-card-title">Spaghetti Carbonara</div><div class="name-card-meta"><span>⏱ 25 min</span><span>👥 2</span></div><span class="coming-soon">Coming Soon</span></div></div>
     <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#6a4a2a,#2a1a0a)">🧁</div><div class="name-card-body"><div class="name-card-cat">Italian · Dessert</div><div class="name-card-title">Classic Tiramisu</div><div class="name-card-meta"><span>⏱ 30 min</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
@@ -576,53 +698,53 @@
 
 <!-- CATEGORY PAGES -->
 <div id="cat-quickeasy" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>⚡ Quick & Easy</h1><p>Delicious dinners on the table in 30 minutes or less.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
-<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
-<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
-<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
-<div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Sides · Bread</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 6</span></div></div></div>
-<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
+<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('garlicbread')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/garlic.jpeg" alt="Garlic Bread" onerror="this.style.background='#c4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Sides · Bread</div><div class="card-title">Cheesy Garlic Bread</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 6</span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
 </div></div></div>
 
 <div id="cat-chicken" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍗 Chicken Recipes</h1><p>From weeknight stir-fries to slow-roasted showstoppers.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#c0502a,#7a2008)">🍗</div><div class="name-card-body"><div class="name-card-cat">Indian · Curry</div><div class="name-card-title">Chicken Tikka Masala</div><div class="name-card-meta"><span>⏱ 45 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
 </div></div></div>
 
 <div id="cat-beef" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🥩 Beef Recipes</h1><p>Bold, hearty, and deeply satisfying beef dishes.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
-<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#8b3a2a,#3a1a08)">🥩</div><div class="name-card-body"><div class="name-card-cat">Korean · Beef</div><div class="name-card-title">Korean Beef Rice Bowl</div><div class="name-card-meta"><span>⏱ 20 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
 </div></div></div>
 
 <div id="cat-pasta" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍝 Pasta Recipes</h1><p>From creamy weeknight pasta to classic Italian sauces.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 8</span></div></div></div>
-<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('lasagna')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/lasanga.jpeg" alt="Lasagna" onerror="this.style.background='#d4a96a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Italian · Pasta</div><div class="card-title">The Best Homemade Lasagna</div><div class="card-meta"><span>⏱ 1 hr 20 min</span><span>👥 8</span></div></div></div>
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#d4b483,#8a6a2a)">🍝</div><div class="name-card-body"><div class="name-card-cat">Italian · Pasta</div><div class="name-card-title">Spaghetti Carbonara</div><div class="name-card-meta"><span>⏱ 25 min</span><span>👥 2</span></div><span class="coming-soon">Coming Soon</span></div></div>
 </div></div></div>
 
 <div id="cat-asian" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍜 Asian Recipes</h1><p>Bold flavours from across Asia — wok-fired and fragrant.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
-<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
-<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
+<div class="card" onclick="showPage('padthai')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/thai.jpeg" alt="Pad Thai" onerror="this.style.background='#c9983a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Thai · Quick</div><div class="card-title">Authentic Pad Thai</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
 </div></div></div>
 
 <div id="cat-mexican" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🌮 Mexican Recipes</h1><p>Fiesta-worthy flavours made fresh at home.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('tacos')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/tacos.jpeg" alt="Tacos" onerror="this.style.background='#c05c2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Mexican · Quick</div><div class="card-title">Crispy Beef Tacos</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
 </div></div></div>
 
 <div id="cat-desserts" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🧁 Desserts</h1><p>Sweet endings to every perfect meal.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Desserts · Chocolate</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('lavacake')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/choco.jpeg" alt="Lava Cakes" onerror="this.style.background='#5d3a2b';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Desserts · Chocolate</div><div class="card-title">Molten Chocolate Lava Cakes</div><div class="card-meta"><span>⏱ 25 min</span><span>👥 4</span></div></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#6a4a2a,#2a1a0a)">🧁</div><div class="name-card-body"><div class="name-card-cat">Italian · Dessert</div><div class="name-card-title">Classic Tiramisu</div><div class="name-card-meta"><span>⏱ 30 min</span><span>👥 8</span></div><span class="coming-soon">Coming Soon</span></div></div>
 </div></div></div>
 
 <div id="cat-soups" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍲 Soups & Stews</h1><p>Warming bowls for cold nights and cozy weekends.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
 </div></div></div>
 
 <div id="cat-onepot" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🫕 One Pot / One Pan</h1><p>All the flavour, minimal washing up.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
-<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
+<div class="card" onclick="showPage('beefstew')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/brew.jpeg" alt="Beef Stew" onerror="this.style.background='#9e5c3a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Beef · Comfort Food</div><div class="card-title">Rich & Hearty Beef Stew</div><div class="card-meta"><span>⏱ 2 hr 30 min</span><span>👥 6</span></div></div></div>
+<div class="card" onclick="showPage('friedrice')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/fried.jpeg" alt="Fried Rice" onerror="this.style.background='#b8971f';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Asian · Rice</div><div class="card-title">Better-Than-Takeout Fried Rice</div><div class="card-meta"><span>⏱ 15 min</span><span>👥 3</span></div></div></div>
 </div></div></div>
 
 <div id="cat-slowcooker" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🍲 Slow Cooker</h1><p>Set it, forget it, come home to something incredible.</p></div><div class="viewall-grid">
@@ -634,7 +756,7 @@
 </div></div></div>
 
 <div id="cat-vegetarian" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🥗 Vegetarian</h1><p>Meatless meals that are anything but boring.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
+<div class="card" onclick="showPage('mushroompasta')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/pasta.jpeg" alt="Mushroom Pasta" onerror="this.style.background='#8d7a5a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Vegetarian · Pasta</div><div class="card-title">Creamy Mushroom Pasta</div><div class="card-meta"><span>⏱ 20 min</span><span>👥 2</span></div></div></div>
 <div class="name-card"><div class="name-card-thumb" style="background:linear-gradient(135deg,#4a7a3a,#1a3a1a)">🥗</div><div class="name-card-body"><div class="name-card-cat">Greek · Salad</div><div class="name-card-title">Classic Greek Salad</div><div class="name-card-meta"><span>⏱ 10 min</span><span>👥 4</span></div><span class="coming-soon">Coming Soon</span></div></div>
 </div></div></div>
 
@@ -643,7 +765,7 @@
 </div></div></div>
 
 <div id="cat-glutenfree" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🌾 Gluten Free</h1><p>All the flavour, none of the gluten.</p></div><div class="viewall-grid">
-<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
+<div class="card" onclick="showPage('butterchicken')" style="cursor:pointer"><div class="card-img-wrap"><img class="card-img" src="../assets/images/butter.jpeg" alt="Butter Chicken" onerror="this.style.background='#c0663a';this.removeAttribute('src')"></div><div class="card-body"><div class="card-cat">Indian · Curry</div><div class="card-title">Creamy Butter Chicken</div><div class="card-meta"><span>⏱ 35 min</span><span>👥 4</span></div></div></div>
 </div></div></div>
 
 <div id="cat-salads" class="page"><div class="viewall-inner"><button class="back-btn" onclick="showPage('home')">← Back to Home</button><div class="viewall-header"><h1>🥗 Salads</h1><p>Fresh, vibrant, and actually satisfying.</p></div><div class="viewall-grid">
@@ -715,7 +837,7 @@
 <div id="lasagna" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
-<img src="../assets/lasanga.jpeg" class="recipe-hero-img" alt="Lasagna" onerror="this.style.background='linear-gradient(135deg,#c8783a,#7a3a12)';this.removeAttribute('src')">
+<img src="../assets/images/lasanga.jpeg" class="recipe-hero-img" alt="Lasagna" onerror="this.style.background='linear-gradient(135deg,#c8783a,#7a3a12)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>The Best Homemade Lasagna</h1>
 <div class="recipe-meta-bar">
@@ -752,7 +874,7 @@
 <p>Leftovers keep in the fridge for up to 4 days. Freeze tightly wrapped for up to 3 months. Thaw overnight in the fridge before reheating.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/lasanga.mp4" title="The Best Homemade Lasagna Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/lasanga.mp4" title="The Best Homemade Lasagna Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -763,7 +885,7 @@
 <div id="beefstew" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
-<img src="../assets/brew.jpeg" class="recipe-hero-img" alt="Beef Stew" onerror="this.style.background='linear-gradient(135deg,#7a3a12,#3a1a08)';this.removeAttribute('src')">
+<img src="../assets/images/brew.jpeg" class="recipe-hero-img" alt="Beef Stew" onerror="this.style.background='linear-gradient(135deg,#7a3a12,#3a1a08)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Rich & Hearty Beef Stew</h1>
 <div class="recipe-meta-bar">
@@ -797,7 +919,7 @@
 <p>Keeps in the fridge 4–5 days and tastes even better the next day. Freeze up to 3 months.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/brew.mp4" title="Rich & Hearty Beef Stew Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/brew.mp4" title="Rich & Hearty Beef Stew Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -808,7 +930,7 @@
 <div id="padthai" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
-<img src="../assets/thai.jpeg" class="recipe-hero-img" alt="Pad Thai" onerror="this.style.background='linear-gradient(135deg,#c9983a,#7a5a12)';this.removeAttribute('src')">
+<img src="../assets/images/thai.jpeg" class="recipe-hero-img" alt="Pad Thai" onerror="this.style.background='linear-gradient(135deg,#c9983a,#7a5a12)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Authentic Pad Thai</h1>
 <div class="recipe-meta-bar">
@@ -842,7 +964,7 @@
 <p>Best eaten fresh. Leftovers keep 2 days. Reheat in a hot pan with a splash of water.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/thai.mp4" title="Authentic Pad Thai Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/thai.mp4" title="Authentic Pad Thai Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -853,7 +975,7 @@
 <div id="butterchicken" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
-<img src="../assets/butter.jpeg" class="recipe-hero-img" alt="Butter Chicken" onerror="this.style.background='linear-gradient(135deg,#c0663a,#7a2a08)';this.removeAttribute('src')">
+<img src="../assets/images/butter.jpeg" class="recipe-hero-img" alt="Butter Chicken" onerror="this.style.background='linear-gradient(135deg,#c0663a,#7a2a08)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Creamy Butter Chicken</h1>
 <div class="recipe-meta-bar">
@@ -884,7 +1006,7 @@
 <p>Fridge 4 days. Freeze 3 months. Flavour deepens overnight — great for meal prep.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/Butter.mp4" title="Creamy Butter Chicken Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/Butter.mp4" title="Creamy Butter Chicken Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -895,7 +1017,7 @@
 <div id="garlicbread" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
-<img src="../assets/garlic.jpeg" class="recipe-hero-img" alt="Garlic Bread" onerror="this.style.background='linear-gradient(135deg,#c4a96a,#8a6a2a)';this.removeAttribute('src')">
+<img src="../assets/images/garlic.jpeg" class="recipe-hero-img" alt="Garlic Bread" onerror="this.style.background='linear-gradient(135deg,#c4a96a,#8a6a2a)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Cheesy Garlic Bread</h1>
 <div class="recipe-meta-bar">
@@ -930,7 +1052,7 @@
 <div id="lavacake" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
-<img src="../assets/choco.jpeg" class="recipe-hero-img" alt="Lava Cakes" onerror="this.style.background='linear-gradient(135deg,#5d3a2b,#1a0a05)';this.removeAttribute('src')">
+<img src="../assets/images/choco.jpeg" class="recipe-hero-img" alt="Lava Cakes" onerror="this.style.background='linear-gradient(135deg,#5d3a2b,#1a0a05)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Molten Chocolate Lava Cakes</h1>
 <div class="recipe-meta-bar">
@@ -962,7 +1084,7 @@
 <p>Fill ramekins and refrigerate up to 24 hours. Add 2 extra minutes if baking from cold.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/choco.mp4" title="Molten Chocolate Lava Cakes Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/choco.mp4" title="Molten Chocolate Lava Cakes Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -973,7 +1095,7 @@
 <div id="friedrice" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
-<img src="../assets/fried.jpeg" class="recipe-hero-img" alt="Fried Rice" onerror="this.style.background='linear-gradient(135deg,#b8971f,#6a5a10)';this.removeAttribute('src')">
+<img src="../assets/images/fried.jpeg" class="recipe-hero-img" alt="Fried Rice" onerror="this.style.background='linear-gradient(135deg,#b8971f,#6a5a10)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Better-Than-Takeout Fried Rice</h1>
 <div class="recipe-meta-bar">
@@ -1005,7 +1127,7 @@
 <p>Fridge 3 days. Freeze 1 month. Reheat in hot pan with a splash of water.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/fried rice.mp4" title="Better-Than-Takeout Fried Rice Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/fried rice.mp4" title="Better-Than-Takeout Fried Rice Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -1016,7 +1138,7 @@
 <div id="tacos" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('viewall')">← Back to All Recipes</button>
-<img src="../assets/tacos.jpeg" class="recipe-hero-img" alt="Tacos" onerror="this.style.background='linear-gradient(135deg,#c05c2b,#6a2a08)';this.removeAttribute('src')">
+<img src="../assets/images/tacos.jpeg" class="recipe-hero-img" alt="Tacos" onerror="this.style.background='linear-gradient(135deg,#c05c2b,#6a2a08)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Crispy Beef Tacos</h1>
 <div class="recipe-meta-bar">
@@ -1052,7 +1174,7 @@
 <div id="mushroompasta" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn" onclick="showPage('italian')">← Back to Italian Recipes</button>
-<img src="../assets/pasta.jpeg" class="recipe-hero-img" alt="Mushroom Pasta" onerror="this.style.background='linear-gradient(135deg,#8d7a5a,#3a2a1a)';this.removeAttribute('src')">
+<img src="../assets/images/pasta.jpeg" class="recipe-hero-img" alt="Mushroom Pasta" onerror="this.style.background='linear-gradient(135deg,#8d7a5a,#3a2a1a)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Creamy Mushroom Pasta</h1>
 <div class="recipe-meta-bar">
@@ -1088,7 +1210,7 @@
 <div id="mangoLassi" class="page">
 <div class="recipe-page-inner">
 <button class="back-btn drinks-back" onclick="showPage('home')">← Back to Home</button>
-<img src="../assets/mango.jpeg" class="recipe-hero-img" alt="Mango Lassi" onerror="this.style.background='linear-gradient(135deg,#f7d070,#e8a020)';this.removeAttribute('src')">
+<img src="../assets/images/mango.jpeg" class="recipe-hero-img" alt="Mango Lassi" onerror="this.style.background='linear-gradient(135deg,#f7d070,#e8a020)';this.removeAttribute('src')">
 <div class="recipe-content">
 <h1>Mango Lassi</h1>
 <div class="recipe-meta-bar drinks-meta">
@@ -1163,7 +1285,7 @@
 <p>Best made fresh. Refrigerate brewed chai up to 2 days and reheat gently on the stovetop — do not microwave.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/Chai.mp4" title="Masala Chai Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/Chai.mp4" title="Masala Chai Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -1205,7 +1327,7 @@
 <p>The lemon-syrup base keeps in the fridge up to 5 days. Only add sparkling water just before serving.</p>
 <h2>Video Tutorial</h2>
 <div class="video-container">
-<iframe width="100%" height="450" mute src="../assets/limonta.mp4" title="Sparkling Limonata Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="450" mute src="../assets/videos/limonta.mp4" title="Sparkling Limonata Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <p style="margin-top:12px;font-size:13px;color:#999;">Add video URL in the iframe src attribute above</p>
 </div>
 </div>
@@ -1285,6 +1407,107 @@
   </div>
 </div>
 
-<script src="index.js"></script>
+<!-- SETTINGS PAGE -->
+<div id="settings" class="page">
+  <div class="static-page-inner" style="max-width: 800px;">
+    <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+    <div class="settings-header">
+      <h1>⚙️ Settings</h1>
+      <p>Customise your cooking experience and manage your account.</p>
+    </div>
+
+    <div class="settings-grid">
+      <!-- Account Section -->
+      <div class="settings-section">
+        <h2 class="settings-sec-title">👤 Account Profile</h2>
+        <div class="settings-group">
+          <div class="settings-field">
+            <label>Display Name</label>
+            <input type="text" id="set-name" placeholder="Enter your name" class="settings-input">
+          </div>
+          <div class="settings-field">
+            <label>Email Address</label>
+            <input type="email" id="set-email" placeholder="your@email.com" class="settings-input">
+          </div>
+          <button class="settings-btn" onclick="saveAccountSettings()">Save Profile</button>
+        </div>
+      </div>
+
+      <!-- Appearance Section -->
+      <div class="settings-section">
+        <h2 class="settings-sec-title">🎨 Appearance</h2>
+        <div class="settings-group">
+          <div class="settings-field row">
+            <div class="field-label">
+              <strong>Dark Mode</strong>
+              <p>Switch between light and dark themes</p>
+            </div>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="set-dark-mode" onchange="toggleDarkMode()">
+            </div>
+          </div>
+          <div class="settings-field">
+            <label>Font Size</label>
+            <div class="segmented-control">
+              <label><input type="radio" name="font-size" value="small" onchange="updateFontSize('small')"> <span>Small</span></label>
+              <label><input type="radio" name="font-size" value="medium" checked onchange="updateFontSize('medium')"> <span>Medium</span></label>
+              <label><input type="radio" name="font-size" value="large" onchange="updateFontSize('large')"> <span>Large</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cooking Preferences -->
+      <div class="settings-section">
+        <h2 class="settings-sec-title">🥘 Cooking Preferences</h2>
+        <div class="settings-group">
+          <div class="settings-field">
+            <label>Measurement System</label>
+            <div class="segmented-control">
+              <label><input type="radio" name="units" value="metric" checked onchange="updateUnits('metric')"> <span>Metric (g, ml)</span></label>
+              <label><input type="radio" name="units" value="imperial" onchange="updateUnits('imperial')"> <span>Imperial (oz, lb)</span></label>
+            </div>
+          </div>
+          <div class="settings-field">
+            <label>Default Servings</label>
+            <input type="number" id="set-servings" value="4" min="1" max="20" class="settings-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-section">
+        <h2 class="settings-sec-title">🔔 Notifications</h2>
+        <div class="settings-group">
+          <div class="settings-field row">
+            <div class="field-label">
+              <strong>Email Newsletter</strong>
+              <p>Weekly recipes and cooking tips</p>
+            </div>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="set-nl" checked>
+            </div>
+          </div>
+          <div class="settings-field row">
+            <div class="field-label">
+              <strong>Cooking Reminders</strong>
+              <p>Alerts for your saved recipes</p>
+            </div>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="set-reminders">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <button class="settings-btn secondary" onclick="resetSettings()">Restore Defaults</button>
+      <p style="margin-top: 20px; font-size: 12px; color: #999;">RecipeTin Eats v2.4.0 • Built for Food Lovers</p>
+    </div>
+  </div>
+</div>
+
+<script src="js/index.js"></script>
 </body>
 </html>

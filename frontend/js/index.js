@@ -1,7 +1,28 @@
+// Recipe metadata for favourites system
+const recipeData = {
+  lasagna:       { title: 'The Best Homemade Lasagna',        cat: 'Italian · Pasta',       time: '1 hr 20 min', servings: 8,  img: '/assets/images/lasanga.jpeg' },
+  beefstew:      { title: 'Rich & Hearty Beef Stew',          cat: 'Beef · Comfort Food',   time: '2 hr 30 min', servings: 6,  img: '/assets/images/brew.jpeg' },
+  padthai:       { title: 'Authentic Pad Thai',               cat: 'Thai · Quick',          time: '20 min',      servings: 2,  img: '/assets/images/thai.jpeg' },
+  butterchicken: { title: 'Creamy Butter Chicken',            cat: 'Indian · Curry',        time: '35 min',      servings: 4,  img: '/assets/images/butter.jpeg' },
+  garlicbread:   { title: 'Cheesy Garlic Bread',              cat: 'Sides · Bread',         time: '15 min',      servings: 6,  img: '/assets/images/garlic.jpeg' },
+  lavacake:      { title: 'Molten Chocolate Lava Cakes',      cat: 'Desserts · Chocolate',  time: '25 min',      servings: 4,  img: '/assets/images/choco.jpeg' },
+  friedrice:     { title: 'Better-Than-Takeout Fried Rice',   cat: 'Asian · Rice',          time: '15 min',      servings: 3,  img: '/assets/images/fried.jpeg' },
+  tacos:         { title: 'Crispy Beef Tacos',                cat: 'Mexican · Quick',       time: '25 min',      servings: 4,  img: '/assets/images/tacos.jpeg' },
+  mushroompasta: { title: 'Creamy Mushroom Pasta',            cat: 'Vegetarian · Pasta',    time: '20 min',      servings: 2,  img: '/assets/images/pasta.jpeg' },
+  mangoLassi:    { title: 'Mango Lassi',                      cat: 'Indian · Mocktail',     time: '5 min',       servings: 2,  img: '/assets/images/mango.jpeg' },
+  masalachai:    { title: 'Masala Chai',                      cat: 'Indian · Hot Drink',    time: '10 min',      servings: 2,  img: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&q=80' },
+  limonata:      { title: 'Sparkling Limonata',               cat: 'Italian · Mocktail',    time: '8 min',       servings: 4,  img: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=600&q=80' },
+  matcharose:    { title: 'Matcha Rose Latte',                cat: 'Japanese · Hot/Iced',   time: '7 min',       servings: 1,  img: 'https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?w=600&q=80' }
+};
+
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Update reading progress
+  updateReadingProgress();
+  // If favourites page, refresh it
+  if (id === 'favourites') renderFavouritesPage();
 }
 
 function scrollToDrinks() {
@@ -28,7 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize nutrition calculator
   initNutrition();
-  
+
+  // New features
+  initDarkMode();
+  initFavouriteButtons();
+  initReadingProgress();
+  initScrollToTop();
+  initStatCounters();
+  initSettings();
+
   const searchInput = document.getElementById('search-input');
   const viewallHeader = document.querySelector('#viewall .viewall-header h1');
   const viewallSub = document.querySelector('#viewall .viewall-header p');
@@ -89,8 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Auto-fetch all dishes for the Chef Picks page on initial load
-  performChefSearch();
 });
 
 function updateQty(btn, delta, event) {
@@ -578,43 +605,341 @@ function subscribeNewsletter(btn) {
   input.value = ''; // clear the input after success
 }
 
-async function performChefSearch() {
-  const query = document.getElementById('chef-search-input').value.trim();
-  const container = document.getElementById('chef-search-results');
-  
-  container.innerHTML = '<p style="color:#888;">Searching...</p>';
-  
-  try {
-    const url = query ? `http://localhost:8000/api/dishes?q=${encodeURIComponent(query)}` : 'http://localhost:8000/api/dishes';
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Network response was not ok');
-    
-    const dishes = await response.json();
-    
-    if (dishes.length === 0) {
-      container.innerHTML = `<p style="color:#888;">No dishes found matching "${query}".</p>`;
-      return;
-    }
-    
-    container.innerHTML = '';
-    
-    dishes.forEach(dish => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-img-wrap" onclick="alert('Recipe details coming soon for ${dish.name}!')">
-          <img class="card-img" src="${dish.image}" alt="${dish.name}" onerror="this.style.background='#c0502a';this.removeAttribute('src')">
-        </div>
-        <div class="card-body">
-          <div class="card-cat">${dish.category}</div>
-          <div class="card-title">${dish.name}</div>
-          <div class="card-meta"><span>⏱ ${dish.time}</span><span>👥 ${dish.servings} servings</span></div>
-        </div>
-      `;
-      container.appendChild(card);
-    });
-  } catch (error) {
-    console.error('Failed to search API dishes:', error);
-    container.innerHTML = '<p style="color:var(--rust);">⚠️ Search failed. Ensure FastAPI backend is running on port 8000.</p>';
+
+// ── TOAST NOTIFICATION ──
+function showToast(msg, duration = 2800) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// ── DARK MODE ──
+function initDarkMode() {
+  const isDark = localStorage.getItem('rte-dark-mode') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-mode');
+    const btn = document.getElementById('dark-mode-btn');
+    if (btn) btn.textContent = '☀️';
   }
 }
+
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('rte-dark-mode', isDark);
+  const btn = document.getElementById('dark-mode-btn');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+  showToast(isDark ? '🌙 Dark mode on' : '☀️ Light mode on', 2000);
+}
+
+// ── FAVOURITES ──
+function getFavourites() {
+  return JSON.parse(localStorage.getItem('rte-favourites') || '[]');
+}
+
+function saveFavourites(favs) {
+  localStorage.setItem('rte-favourites', JSON.stringify(favs));
+  updateFavNavCount();
+}
+
+function updateFavNavCount() {
+  const favs = getFavourites();
+  const countEl = document.getElementById('fav-nav-count');
+  if (!countEl) return;
+  if (favs.length > 0) {
+    countEl.textContent = favs.length;
+    countEl.style.display = 'inline';
+  } else {
+    countEl.style.display = 'none';
+  }
+}
+
+function toggleFavourite(recipeId, btn) {
+  let favs = getFavourites();
+  const idx = favs.indexOf(recipeId);
+  if (idx === -1) {
+    favs.push(recipeId);
+    if (btn) {
+      btn.textContent = '❤️';
+      btn.classList.add('active');
+    }
+    showToast('❤️ Saved to Favourites!');
+  } else {
+    favs.splice(idx, 1);
+    if (btn) {
+      btn.textContent = '🤍';
+      btn.classList.remove('active');
+    }
+    showToast('🤍 Removed from Favourites');
+  }
+  saveFavourites(favs);
+}
+
+function initFavouriteButtons() {
+  updateFavNavCount();
+  const favs = getFavourites();
+  
+  // 1. Add fav + share bar to every recipe page
+  document.querySelectorAll('.recipe-page-inner').forEach(inner => {
+    const page = inner.closest('.page');
+    if (!page) return;
+    const recipeId = page.id;
+    const data = recipeData[recipeId];
+    if (!data) return;
+    const h1 = inner.querySelector('.recipe-content h1');
+    if (!h1 || h1.parentElement.querySelector('.recipe-fav-bar')) return;
+    const isFav = favs.includes(recipeId);
+    const bar = document.createElement('div');
+    bar.className = 'recipe-fav-bar';
+    bar.innerHTML = `
+      <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavourite('${recipeId}', this)" title="Save to favourites">${isFav ? '❤️' : '🤍'}</button>
+      <button class="share-btn" onclick="shareRecipe('${recipeId}')">📤 Share Recipe</button>
+    `;
+    h1.after(bar);
+  });
+
+  // 2. Add floating heart to all cards in grids
+  document.querySelectorAll('.card').forEach(card => {
+    const imgWrap = card.querySelector('.card-img-wrap');
+    if (!imgWrap || imgWrap.querySelector('.floating-fav-btn')) return;
+    
+    // Determine recipe ID from card's onclick showPage('...')
+    const onclickStr = card.getAttribute('onclick') || '';
+    const match = onclickStr.match(/showPage\('([^']+)'\)/);
+    if (!match) return;
+    const recipeId = match[1];
+    
+    const isFav = favs.includes(recipeId);
+    const floatBtn = document.createElement('button');
+    floatBtn.className = `floating-fav-btn ${isFav ? 'active' : ''}`;
+    floatBtn.innerHTML = isFav ? '❤️' : '🤍';
+    floatBtn.title = 'Add to Favourites';
+    floatBtn.onclick = (e) => {
+      e.stopPropagation();
+      toggleFavourite(recipeId, floatBtn);
+      // Update UI state
+      floatBtn.innerHTML = getFavourites().includes(recipeId) ? '❤️' : '🤍';
+      floatBtn.classList.toggle('active', getFavourites().includes(recipeId));
+    };
+    imgWrap.appendChild(floatBtn);
+  });
+}
+
+function renderFavouritesPage() {
+  const favs = getFavourites();
+  const grid = document.getElementById('favs-grid');
+  const empty = document.getElementById('favs-empty');
+  const subtitle = document.getElementById('favs-subtitle');
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (favs.length === 0) {
+    if (empty) empty.style.display = 'block';
+    if (subtitle) subtitle.style.display = 'none';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  if (subtitle) {
+    subtitle.style.display = '';
+    subtitle.textContent = `${favs.length} saved recipe${favs.length > 1 ? 's' : ''} — all in one place.`;
+  }
+  favs.forEach(id => {
+    const d = recipeData[id];
+    if (!d) return;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cursor = 'pointer';
+    card.innerHTML = `
+      <div class="card-img-wrap" onclick="showPage('${id}')">
+        <img class="card-img" src="${d.img}" alt="${d.title}" onerror="this.style.background='#c0502a';this.removeAttribute('src')">
+      </div>
+      <div class="card-body">
+        <div class="card-cat">${d.cat}</div>
+        <div class="card-title">${d.title}</div>
+        <div class="card-meta"><span>⏱ ${d.time}</span><span>👥 ${d.servings}</span></div>
+        <button class="fav-btn active" onclick="event.stopPropagation();toggleFavourite('${id}', this); setTimeout(renderFavouritesPage, 50);" style="margin-top:8px;font-size:16px;">❤️ Unsave</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ── SHARE RECIPE ──
+function shareRecipe(recipeId) {
+  const data = recipeData[recipeId];
+  const title = data ? data.title : recipeId;
+  const url = `${window.location.origin}${window.location.pathname}#${recipeId}`;
+  const text = `🍽️ Check out this recipe: ${title} — ${url}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('📋 Link copied to clipboard!'))
+      .catch(() => showToast('⚠️ Could not copy link'));
+  } else {
+    showToast('📋 Share: ' + url, 4000);
+  }
+}
+
+// ── READING PROGRESS BAR ──
+function initReadingProgress() {
+  window.addEventListener('scroll', updateReadingProgress, { passive: true });
+}
+
+function updateReadingProgress() {
+  const bar = document.getElementById('reading-progress-bar');
+  if (!bar) return;
+  const activePage = document.querySelector('.page.active');
+  const isRecipePage = activePage && activePage.querySelector('.recipe-page-inner');
+  if (!isRecipePage) {
+    bar.style.width = '0%';
+    return;
+  }
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  bar.style.width = Math.min(progress, 100) + '%';
+}
+
+// ── SCROLL TO TOP BUTTON ──
+function initScrollToTop() {
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scroll-top-btn');
+    if (!btn) return;
+    if (window.scrollY > 400) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }, { passive: true });
+}
+
+// ── ANIMATED STAT COUNTERS ──
+function initStatCounters() {
+  const statEls = document.querySelectorAll('.stat-number');
+  if (!statEls.length) return;
+
+  const parseStatValue = (text) => {
+    const cleaned = text.replace(/[^0-9.]/g, '');
+    return parseFloat(cleaned) || 0;
+  };
+
+  const formatStatValue = (original, current) => {
+    if (original.includes('M+')) return Math.round(current) + 'M+';
+    if (original.includes('+')) return Math.round(current).toLocaleString() + '+';
+    if (original.includes('.')) return current.toFixed(1);
+    return Math.round(current).toLocaleString();
+  };
+
+  const animateStat = (el, target, original) => {
+    const duration = 1800;
+    const startTime = performance.now();
+    const easeOut = t => 1 - Math.pow(1 - t, 3);
+    const step = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const current = target * easeOut(progress);
+      el.textContent = formatStatValue(original, current);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = original;
+    };
+    requestAnimationFrame(step);
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const originalText = el.dataset.original || el.textContent;
+        el.dataset.original = originalText;
+        const target = parseStatValue(originalText);
+        animateStat(el, target, originalText);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  statEls.forEach(el => observer.observe(el));
+}
+
+// ── SETTINGS SYSTEM ──
+function initSettings() {
+  // Load saved settings
+  const name = localStorage.getItem('rte-user-name') || '';
+  const email = localStorage.getItem('rte-user-email') || '';
+  const fontSize = localStorage.getItem('rte-font-size') || 'medium';
+  const units = localStorage.getItem('rte-units') || 'metric';
+  const servings = localStorage.getItem('rte-default-servings') || '4';
+  const newsletter = localStorage.getItem('rte-newsletter') !== 'false';
+  const reminders = localStorage.getItem('rte-reminders') === 'true';
+
+  // Populate UI
+  const nameInput = document.getElementById('set-name');
+  const emailInput = document.getElementById('set-email');
+  const servingsInput = document.getElementById('set-servings');
+  const darkModeToggle = document.getElementById('set-dark-mode');
+  const nlToggle = document.getElementById('set-nl');
+  const reminderToggle = document.getElementById('set-reminders');
+
+  if (nameInput) nameInput.value = name;
+  if (emailInput) emailInput.value = email;
+  if (servingsInput) servingsInput.value = servings;
+  if (darkModeToggle) darkModeToggle.checked = document.body.classList.contains('dark-mode');
+  if (nlToggle) nlToggle.checked = newsletter;
+  if (reminderToggle) reminderToggle.checked = reminders;
+
+  // Apply font size
+  updateFontSize(fontSize, false);
+
+  // Set radio buttons
+  const fontRadios = document.querySelectorAll(`input[name="font-size"][value="${fontSize}"]`);
+  if (fontRadios.length) fontRadios[0].checked = true;
+
+  const unitRadios = document.querySelectorAll(`input[name="units"][value="${units}"]`);
+  if (unitRadios.length) unitRadios[0].checked = true;
+}
+
+function saveAccountSettings() {
+  const name = document.getElementById('set-name').value;
+  const email = document.getElementById('set-email').value;
+  localStorage.setItem('rte-user-name', name);
+  localStorage.setItem('rte-user-email', email);
+  showToast('✅ Profile saved successfully!');
+}
+
+function updateFontSize(size, notify = true) {
+  document.body.classList.remove('font-small', 'font-medium', 'font-large');
+  document.body.classList.add(`font-${size}`);
+  localStorage.setItem('rte-font-size', size);
+  if (notify) showToast(`🔤 Font size set to ${size}`);
+}
+
+function updateUnits(unit) {
+  localStorage.setItem('rte-units', unit);
+  showToast(`⚖️ Units set to ${unit}`);
+}
+
+function resetSettings() {
+  if (confirm('Are you sure you want to restore all settings to default?')) {
+    localStorage.removeItem('rte-user-name');
+    localStorage.removeItem('rte-user-email');
+    localStorage.removeItem('rte-font-size');
+    localStorage.removeItem('rte-units');
+    localStorage.removeItem('rte-default-servings');
+    localStorage.removeItem('rte-newsletter');
+    localStorage.removeItem('rte-reminders');
+    localStorage.removeItem('rte-dark-mode');
+    
+    // Reset classes and reload
+    document.body.classList.remove('dark-mode', 'font-small', 'font-large');
+    location.reload();
+  }
+}
+
+// Sync dark mode toggle in settings if it exists
+const originalToggleDarkMode = toggleDarkMode;
+window.toggleDarkMode = function() {
+  originalToggleDarkMode();
+  const setDarkModeToggle = document.getElementById('set-dark-mode');
+  if (setDarkModeToggle) {
+    setDarkModeToggle.checked = document.body.classList.contains('dark-mode');
+  }
+};
