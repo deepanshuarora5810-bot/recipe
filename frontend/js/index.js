@@ -943,3 +943,402 @@ window.toggleDarkMode = function() {
     setDarkModeToggle.checked = document.body.classList.contains('dark-mode');
   }
 };
+
+// ── RECIPE FEATURES (RATINGS, NOTES, PRINT) ───────────────────────────────────
+function initRecipeFeatures() {
+  document.querySelectorAll('.recipe-page-inner').forEach(inner => {
+    const page = inner.closest('.page');
+    if (!page) return;
+    const recipeId = page.id;
+
+    // 1. Print Buttons
+    const favBar = inner.querySelector('.recipe-fav-bar');
+    if (favBar && !favBar.querySelector('.print-btn')) {
+      const printBtn = document.createElement('button');
+      printBtn.className = 'print-btn';
+      printBtn.innerHTML = '🖨️ Print';
+      printBtn.onclick = () => window.print();
+      favBar.appendChild(printBtn);
+    }
+
+    // 2. Personal Notes
+    if (!inner.querySelector('.notes-section')) {
+      const notesSaved = localStorage.getItem(`rte-notes-${recipeId}`) || '';
+      const notesSection = document.createElement('div');
+      notesSection.className = 'notes-section';
+      notesSection.innerHTML = `
+        <h3>📝 My Notes</h3>
+        <textarea class="recipe-notes-ta" id="notes-${recipeId}" placeholder="Jot down your personal tweaks, substitutions, tips…">${notesSaved}</textarea>
+        <button class="notes-save-btn" onclick="saveNote('${recipeId}')">💾 Save Note</button>
+      `;
+      inner.querySelector('.recipe-content').appendChild(notesSection);
+    }
+
+    // 3. Ratings & Reviews
+    if (!inner.querySelector('.rating-section')) {
+      const ratingSection = document.createElement('div');
+      ratingSection.className = 'rating-section';
+      ratingSection.innerHTML = `
+        <h3>⭐ Rate & Review</h3>
+        <div class="star-picker" id="stars-${recipeId}">
+          ${[1,2,3,4,5].map(n => `<span data-star="${n}" style="opacity:0.3;cursor:pointer;">★</span>`).join('')}
+        </div>
+        <textarea class="rating-comment" id="comment-${recipeId}" placeholder="Share your experience…"></textarea>
+        <button class="rating-submit-btn" onclick="submitReview('${recipeId}')">Submit Review</button>
+        <div class="user-reviews-list" id="reviews-list-${recipeId}"></div>
+      `;
+
+      const h2s = inner.querySelectorAll('.recipe-content h2');
+      const storageH2 = [...h2s].find(h => h.textContent.includes('Storage'));
+      if (storageH2) storageH2.after(ratingSection);
+      else inner.querySelector('.recipe-content').appendChild(ratingSection);
+
+      const starPicker = document.getElementById(`stars-${recipeId}`);
+      if (starPicker) {
+        let selectedStars = 0;
+        starPicker.querySelectorAll('span').forEach(star => {
+          star.onmouseover = () => {
+            const hov = parseInt(star.dataset.star);
+            starPicker.querySelectorAll('span').forEach((s, i) => s.style.opacity = i < hov ? '1' : '0.3');
+          };
+          star.onmouseleave = () => starPicker.querySelectorAll('span').forEach((s, i) => s.style.opacity = i < selectedStars ? '1' : '0.3');
+          star.onclick = () => {
+            selectedStars = parseInt(star.dataset.star);
+            starPicker.dataset.selected = selectedStars;
+            starPicker.querySelectorAll('span').forEach((s, i) => s.style.opacity = i < selectedStars ? '1' : '0.3');
+          };
+        });
+      }
+      renderReviews(recipeId);
+    }
+  });
+}
+
+function submitReview(recipeId) {
+  const starPicker = document.getElementById(`stars-${recipeId}`);
+  const stars = parseInt(starPicker?.dataset.selected || 0);
+  const comment = document.getElementById(`comment-${recipeId}`)?.value.trim();
+
+  if (!stars) return showToast('⭐ Please select a star rating first!');
+  if (!comment) return showToast('✏️ Please write a short review!');
+
+  const storageKey = `rte-reviews-${recipeId}`;
+  const reviews = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  reviews.push({ stars, comment, date: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) });
+  localStorage.setItem(storageKey, JSON.stringify(reviews));
+
+  starPicker.dataset.selected = 0;
+  starPicker.querySelectorAll('span').forEach(s => s.style.opacity = '0.3');
+  document.getElementById(`comment-${recipeId}`).value = '';
+
+  renderReviews(recipeId);
+  showToast('🎉 Review submitted! Thank you!');
+}
+
+function renderReviews(recipeId) {
+  const container = document.getElementById(`reviews-list-${recipeId}`);
+  if (!container) return;
+  const reviews = JSON.parse(localStorage.getItem(`rte-reviews-${recipeId}`) || '[]');
+  container.innerHTML = reviews.slice().reverse().map(r => `
+    <div class="user-review-item">
+      <div class="user-review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+      <p class="user-review-text">"${r.comment}"</p>
+      <div class="user-review-meta">${r.date}</div>
+    </div>
+  `).join('');
+}
+
+function saveNote(recipeId) {
+  const ta = document.getElementById(`notes-${recipeId}`);
+  if (!ta) return;
+  localStorage.setItem(`rte-notes-${recipeId}`, ta.value);
+  showToast('💾 Note saved!');
+}
+
+// ── SHOPPING LIST ──────────────────────────────────────────────────────────────
+// Ingredient database per recipe (simplified/key items)
+const recipeIngredients = {
+  lasagna:       ['Lasagna sheets', 'Ground beef', 'Ground pork', 'Onion', 'Garlic', 'Crushed tomatoes', 'Tomato paste', 'Butter', 'Plain flour', 'Whole milk', 'Mozzarella', 'Parmesan', 'Oregano', 'Basil'],
+  beefstew:      ['Beef chuck', 'Plain flour', 'Onion', 'Garlic', 'Carrots', 'Celery', 'Red wine', 'Beef stock', 'Tomato paste', 'Potatoes', 'Thyme', 'Bay leaves'],
+  padthai:       ['Rice noodles', 'Shrimp or chicken', 'Eggs', 'Tamarind paste', 'Fish sauce', 'Oyster sauce', 'Sugar', 'Garlic', 'Shallots', 'Bean sprouts', 'Spring onions', 'Peanuts', 'Lime'],
+  butterchicken: ['Chicken thighs', 'Yoghurt', 'Lemon juice', 'Butter', 'Onion', 'Garlic', 'Ginger', 'Garam masala', 'Cumin', 'Coriander', 'Crushed tomatoes', 'Heavy cream'],
+  garlicbread:   ['Baguette', 'Unsalted butter', 'Garlic', 'Fresh parsley', 'Mozzarella', 'Parmesan'],
+  lavacake:      ['Dark chocolate (70%)', 'Unsalted butter', 'Eggs', 'Egg yolks', 'Caster sugar', 'Plain flour', 'Cocoa powder', 'Vanilla ice cream'],
+  friedrice:     ['Day-old cooked rice', 'Eggs', 'Frozen peas and corn', 'Spring onions', 'Garlic', 'Vegetable oil', 'Soy sauce', 'Oyster sauce', 'Sesame oil'],
+  tacos:         ['Ground beef', 'Onion', 'Garlic', 'Cumin', 'Chilli powder', 'Paprika', 'Tomato paste', 'Taco shells', 'Lettuce', 'Tomato', 'Cheddar', 'Sour cream', 'Lime'],
+  mushroompasta: ['Fettuccine', 'Mixed mushrooms', 'Butter', 'Garlic', 'Shallot', 'Heavy cream', 'Dry white wine', 'Parmesan', 'Fresh thyme'],
+  mangoLassi:    ['Ripe mangoes (or tinned Alphonso)', 'Full-fat plain yoghurt', 'Whole milk', 'Sugar or honey', 'Cardamom powder'],
+  masalachai:    ['Whole milk', 'Strong black tea leaves', 'Sugar', 'Green cardamom pods', 'Cloves', 'Cinnamon stick', 'Fresh ginger', 'Black peppercorns'],
+  limonata:      ['Lemons (5–6)', 'Sparkling water', 'Sugar', 'Fresh mint or basil'],
+  matcharose:    ['Ceremonial-grade matcha powder', 'Oat milk or whole milk', 'Rose syrup', 'Dried rose petals'],
+};
+
+let shoppingState = {
+  selectedRecipes: new Set(),
+  customItems: [],
+  checkedItems: new Set(),
+};
+
+function initShoppingList() {
+  // Load state
+  const saved = localStorage.getItem('rte-shopping-state');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      shoppingState.selectedRecipes = new Set(parsed.selectedRecipes || []);
+      shoppingState.customItems = parsed.customItems || [];
+      shoppingState.checkedItems = new Set(parsed.checkedItems || []);
+    } catch(e) {}
+  }
+
+  // Build recipe chips
+  const chipsContainer = document.getElementById('shopping-chips');
+  if (!chipsContainer) return;
+  chipsContainer.innerHTML = '';
+  Object.entries(recipeData).forEach(([id, data]) => {
+    const chip = document.createElement('button');
+    chip.className = 'recipe-chip' + (shoppingState.selectedRecipes.has(id) ? ' selected' : '');
+    chip.textContent = data.title;
+    chip.onclick = () => toggleShoppingRecipe(id, chip);
+    chipsContainer.appendChild(chip);
+  });
+  renderShoppingList();
+}
+
+function toggleShoppingRecipe(id, chip) {
+  if (shoppingState.selectedRecipes.has(id)) {
+    shoppingState.selectedRecipes.delete(id);
+    chip.classList.remove('selected');
+  } else {
+    shoppingState.selectedRecipes.add(id);
+    chip.classList.add('selected');
+  }
+  saveShoppingState();
+  renderShoppingList();
+}
+
+function getAllShoppingItems() {
+  const items = [];
+  shoppingState.selectedRecipes.forEach(id => {
+    const ings = recipeIngredients[id] || [];
+    ings.forEach(ing => {
+      const key = `recipe:${ing}`;
+      if (!items.find(i => i.key === key)) {
+        items.push({ key, text: ing, isCustom: false });
+      }
+    });
+  });
+  shoppingState.customItems.forEach((text, idx) => {
+    items.push({ key: `custom:${idx}`, text, isCustom: true });
+  });
+  return items;
+}
+
+function renderShoppingList() {
+  const container = document.getElementById('shopping-items-list');
+  const countEl = document.getElementById('sl-count');
+  const emptyEl = document.getElementById('sl-empty');
+  if (!container) return;
+
+  const items = getAllShoppingItems();
+  if (items.length === 0) {
+    container.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  const unchecked = items.filter(i => !shoppingState.checkedItems.has(i.key)).length;
+  if (countEl) countEl.textContent = `(${unchecked} of ${items.length} remaining)`;
+
+  container.innerHTML = items.map(item => `
+    <div class="shopping-item-row">
+      <input type="checkbox" class="shopping-cb" ${shoppingState.checkedItems.has(item.key) ? 'checked' : ''} onchange="toggleShoppingItem('${item.key}', this)">
+      <span class="shopping-item-text ${shoppingState.checkedItems.has(item.key) ? 'checked' : ''}">${item.text}</span>
+      ${item.isCustom ? `<button class="shopping-del" onclick="removeCustomItem('${item.key}')" title="Remove">✕</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function toggleShoppingItem(key, cb) {
+  if (cb.checked) {
+    shoppingState.checkedItems.add(key);
+  } else {
+    shoppingState.checkedItems.delete(key);
+  }
+  saveShoppingState();
+  renderShoppingList();
+}
+
+function removeCustomItem(key) {
+  const idx = parseInt(key.split(':')[1]);
+  shoppingState.customItems.splice(idx, 1);
+  saveShoppingState();
+  renderShoppingList();
+  initShoppingList(); // Re-render chips too
+}
+
+function clearCheckedItems() {
+  shoppingState.checkedItems.clear();
+  saveShoppingState();
+  renderShoppingList();
+  showToast('✅ Checked items cleared!');
+}
+
+function clearAllItems() {
+  if (!confirm('Clear entire shopping list?')) return;
+  shoppingState.selectedRecipes.clear();
+  shoppingState.customItems = [];
+  shoppingState.checkedItems.clear();
+  saveShoppingState();
+  initShoppingList();
+  showToast('🗑 Shopping list cleared!');
+}
+
+function addCustomShoppingItem() {
+  const input = document.getElementById('sl-custom-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) { showToast('✏️ Please enter an item!'); return; }
+  shoppingState.customItems.push(text);
+  input.value = '';
+  saveShoppingState();
+  renderShoppingList();
+  showToast(`✅ "${text}" added to list!`);
+}
+
+function printShoppingList() {
+  const items = getAllShoppingItems();
+  const win = window.open('', '_blank');
+  win.document.write(`<html><head><title>Shopping List</title><style>body{font-family:sans-serif;padding:20px;max-width:500px;margin:0 auto;}h1{font-size:24px;margin-bottom:16px;}li{font-size:15px;margin:8px 0;list-style:none;padding:4px 0;border-bottom:1px solid #eee;}li.checked{text-decoration:line-through;color:#aaa;}</style></head><body>`);
+  win.document.write(`<h1>🛒 Shopping List</h1><ul>`);
+  items.forEach(i => {
+    win.document.write(`<li class="${shoppingState.checkedItems.has(i.key) ? 'checked' : ''}">${i.text}</li>`);
+  });
+  win.document.write(`</ul><p style="font-size:12px;color:#999;margin-top:20px;">Generated by RecipeTin Eats</p></body></html>`);
+  win.document.close();
+  win.print();
+}
+
+function saveShoppingState() {
+  localStorage.setItem('rte-shopping-state', JSON.stringify({
+    selectedRecipes: [...shoppingState.selectedRecipes],
+    customItems: shoppingState.customItems,
+    checkedItems: [...shoppingState.checkedItems],
+  }));
+}
+
+// ── MEAL PLANNER ───────────────────────────────────────────────────────────────
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+let mealPlan = {}; // { "Monday": ["lasagna", ...], ... }
+let draggedRecipeId = null;
+
+function initMealPlanner() {
+  // Load saved plan
+  const saved = localStorage.getItem('rte-meal-plan');
+  mealPlan = saved ? JSON.parse(saved) : {};
+  DAYS.forEach(d => { if (!mealPlan[d]) mealPlan[d] = []; });
+
+  renderPlannerGrid();
+  renderPalette();
+}
+
+function renderPlannerGrid() {
+  const grid = document.getElementById('planner-grid');
+  if (!grid) return;
+  grid.innerHTML = DAYS.map(day => `
+    <div class="planner-day" id="day-${day}"
+      ondragover="event.preventDefault(); this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="dropOnDay('${day}', event)">
+      <div class="planner-day-name">${day}</div>
+      ${(mealPlan[day] || []).map(id => plannerSlotHTML(day, id)).join('')}
+    </div>
+  `).join('');
+}
+
+function plannerSlotHTML(day, id) {
+  const d = recipeData[id];
+  const title = d ? d.title : id;
+  return `<div class="planner-slot" draggable="true"
+    ondragstart="draggedRecipeId='${id}'"
+    title="Click to open recipe" onclick="showPage('${id}')">
+    🍽️ <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</span>
+    <button class="planner-slot-remove" onclick="event.stopPropagation();removePlannerItem('${day}','${id}')" title="Remove">✕</button>
+  </div>`;
+}
+
+function renderPalette() {
+  const palette = document.getElementById('palette-chips');
+  if (!palette) return;
+  palette.innerHTML = Object.entries(recipeData).map(([id, d]) => `
+    <div class="palette-chip" draggable="true"
+      ondragstart="event.dataTransfer.setData('text/plain','${id}'); draggedRecipeId='${id}'">
+      ${d.title}
+    </div>
+  `).join('');
+}
+
+function dropOnDay(day, event) {
+  event.preventDefault();
+  const el = document.getElementById(`day-${day}`);
+  if (el) el.classList.remove('drag-over');
+  const id = event.dataTransfer.getData('text/plain') || draggedRecipeId;
+  if (!id) return;
+  if (!mealPlan[day]) mealPlan[day] = [];
+  if (mealPlan[day].includes(id)) { showToast('Already on ' + day + '!'); return; }
+  if (mealPlan[day].length >= 3) { showToast('Max 3 meals per day!'); return; }
+  mealPlan[day].push(id);
+  saveMealPlan();
+  renderPlannerGrid();
+  draggedRecipeId = null;
+}
+
+function removePlannerItem(day, id) {
+  mealPlan[day] = (mealPlan[day] || []).filter(r => r !== id);
+  saveMealPlan();
+  renderPlannerGrid();
+}
+
+function clearMealPlan() {
+  if (!confirm('Clear your entire meal plan?')) return;
+  DAYS.forEach(d => { mealPlan[d] = []; });
+  saveMealPlan();
+  renderPlannerGrid();
+  showToast('🗑 Meal plan cleared!');
+}
+
+function savePlanToShoppingList() {
+  // Collect all unique recipe IDs from the plan
+  const allIds = new Set();
+  DAYS.forEach(d => (mealPlan[d] || []).forEach(id => allIds.add(id)));
+  if (allIds.size === 0) { showToast('⚠️ Your meal plan is empty!'); return; }
+  allIds.forEach(id => shoppingState.selectedRecipes.add(id));
+  saveShoppingState();
+  showPage('shoppinglist');
+  initShoppingList();
+  showToast('🛒 Meal plan sent to shopping list!');
+}
+
+function saveMealPlan() {
+  localStorage.setItem('rte-meal-plan', JSON.stringify(mealPlan));
+}
+
+// ── HOOK NEW FEATURES INTO DOMContentLoaded ────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Use a small delay to ensure the recipe pages are fully initialized first
+  setTimeout(() => {
+    initRecipeFeatures();
+    initShoppingList();
+    initMealPlanner();
+  }, 100);
+});
+
+// Reinit on page navigation for dynamic pages
+const _origShowPage = showPage;
+window.showPage = function(id) {
+  _origShowPage(id);
+  if (id === 'shoppinglist') initShoppingList();
+  if (id === 'mealplanner') initMealPlanner();
+};
